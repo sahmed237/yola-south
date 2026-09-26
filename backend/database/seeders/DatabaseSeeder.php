@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RolesAndPermissionsSeeder::class,
-            //AdamawaLgaWardSeeder::class,
-            TarabaLgaWardSeeder::class,
+            AdamawaLgaWardSeeder::class,
+            // TarabaLgaWardSeeder::class,
             SettingSeeder::class,
             EstablishmentSetupSeeder::class,
             FaqSeeder::class,
