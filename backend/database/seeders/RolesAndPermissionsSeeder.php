@@ -38,7 +38,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view invoice',
                 'verify invoice',
                 'view report',
-                'manage revenue rules',
+                'manage revenue heads',
                 'view unpaid taxes',
             ],
             'Agency Management' => [
@@ -82,7 +82,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'view invoice',
             'verify invoice',
             'view report',
-            'manage revenue rules',
+            'manage revenue heads',
             'view all invalid establishment',
             'view unpaid taxes',
         ]);

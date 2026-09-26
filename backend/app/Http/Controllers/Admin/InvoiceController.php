@@ -66,7 +66,7 @@ class InvoiceController extends Controller
             $q->areaRestricted();
         })->with([
             'establishment.occupant',
-            'items.revenueRule',
+            'items.revenueHead',
             'items.agency',
             'splits.agency'
         ])->findOrFail($id);
@@ -83,7 +83,7 @@ class InvoiceController extends Controller
             $q->areaRestricted();
         })->with([
             'establishment.occupant',
-            'items.revenueRule',
+            'items.revenueHead',
             'items.agency',
             'splits.agency'
         ])->findOrFail($id);
@@ -188,7 +188,7 @@ class InvoiceController extends Controller
                     $payment = \App\Models\Payment::create([
                         'invoice_id'      => $invoice->id,
                         'establishment_id'=> $invoice->establishment_id,
-                        'revenue_rule_id' => $item->revenue_rule_id,
+                        'revenue_head_id' => $item->revenue_head_id,
                         'amount'          => $item->amount,
                         'status'          => 'success',
                         'reference'       => $invoice->reference . '-' . $item->id,

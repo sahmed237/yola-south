@@ -192,7 +192,7 @@
                             <table class="w-full text-xs">
                                 <thead class="bg-slate-50 border-b border-slate-100">
                                     <tr>
-                                        <th class="py-3 px-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Revenue Rule</th>
+                                        <th class="py-3 px-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Revenue Head</th>
                                         <th class="py-3 px-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Period</th>
                                         <th class="py-3 px-4 text-left text-[9px] font-black text-slate-400 uppercase tracking-widest">Agency</th>
                                         <th class="py-3 px-4 text-right text-[9px] font-black text-slate-400 uppercase tracking-widest">Amount</th>
@@ -201,7 +201,7 @@
                                 <tbody class="divide-y divide-slate-50">
                                     @foreach($invoice->items as $item)
                                         <tr>
-                                            <td class="py-3 px-4 font-bold text-slate-800">{{ $item->revenueRule->name ?? '—' }}</td>
+                                            <td class="py-3 px-4 font-bold text-slate-800">{{ $item->revenueHead->name ?? $item->revenueRule->name ?? '—' }}</td>
                                             <td class="py-3 px-4 text-slate-500 capitalize">{{ $item->period }}</td>
                                             <td class="py-3 px-4 text-slate-500">{{ $item->agency->name ?? '—' }}</td>
                                             <td class="py-3 px-4 text-right font-black text-slate-800">₦{{ number_format($item->amount, 2) }}</td>

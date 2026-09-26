@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\AgencyController;
 use App\Http\Controllers\Admin\ServiceFeeAgencyController;
 use App\Http\Controllers\Admin\RevenueRuleController;
+use App\Http\Controllers\Admin\RevenueHeadController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\InvoiceController;
@@ -124,7 +125,8 @@ Route::middleware(['auth', 'security_policy'])->prefix('admin')->group(function 
         Route::post('agencies/{agency}/manual-link-paystack', [AgencyController::class, 'manualLinkPaystack'])->name('admin.agencies.manual-link-paystack');
         Route::post('agencies/{agency}/manual-link-monnify', [AgencyController::class, 'manualLinkMonnify'])->name('admin.agencies.manual-link-monnify');
         Route::resource('agencies', AgencyController::class)->names('admin.agencies');
-        Route::resource('revenue-rules', RevenueRuleController::class)->names('admin.revenue-rules');
+        Route::resource('revenue-heads', RevenueHeadController::class)->names('admin.revenue-heads');
+        Route::redirect('revenue-rules', '/admin/revenue-heads');
 
         Route::post('service-fee-agencies/{agency}/retry-paystack', [ServiceFeeAgencyController::class, 'retryPaystack'])->name('admin.service-fee-agencies.retry-paystack');
         Route::post('service-fee-agencies/{agency}/retry-monnify', [ServiceFeeAgencyController::class, 'retryMonnify'])->name('admin.service-fee-agencies.retry-monnify');

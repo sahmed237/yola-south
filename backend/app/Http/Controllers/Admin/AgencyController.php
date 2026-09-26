@@ -151,7 +151,7 @@ class AgencyController extends Controller
 
     public function show(Agency $agency)
     {
-        $agency->load(['paystackSubAccount', 'monnifySubAccount', 'revenueRules']);
+        $agency->load(['paystackSubAccount', 'monnifySubAccount', 'revenueHeads']);
         
         $paystackBanks = [];
         $monnifyBanks = [];
@@ -489,8 +489,8 @@ class AgencyController extends Controller
 
     public function destroy(Agency $agency)
     {
-        if ($agency->revenueRules()->exists()) {
-            return back()->with('error', 'Cannot delete agency with active revenue rules.');
+        if ($agency->revenueHeads()->exists()) {
+            return back()->with('error', 'Cannot delete agency with active revenue heads.');
         }
 
         $agency->delete();

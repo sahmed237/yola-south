@@ -229,9 +229,9 @@
                         <i data-lucide="percent" class="w-5 h-5 mr-3"></i>
                         Service Fee Setup
                     </a>
-                    <a href="{{ route('admin.revenue-rules.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.revenue-rules.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
+                    <a href="{{ route('admin.revenue-heads.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.revenue-heads.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
                         <i data-lucide="calculator" class="w-5 h-5 mr-3"></i>
-                        Revenue Rules
+                        Revenue Heads
                     </a>
                     @endrole
 

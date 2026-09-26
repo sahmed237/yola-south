@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\PaymentSplit;
 use App\Models\Payment;
 use App\Models\Agency;
+use App\Models\RevenueHead;
 use App\Models\RevenueRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -23,7 +24,8 @@ class ReportController extends Controller
 
         // Fetch filter dropdown options
         $agencies = Agency::orderBy('name')->get();
-        $revenueRules = RevenueRule::orderBy('name')->get();
+        $revenueHeads = RevenueHead::orderBy('name')->get();
+        $revenueRules = $revenueHeads;
 
         // 1. Calculate Aggregations
         $rawStats = (clone $query)->select(
@@ -59,21 +61,21 @@ class ReportController extends Controller
             ];
         })->sortByDesc('gross')->values();
 
-        // 3. Revenue Rules Breakdown (Source Collections)
+        // 3. Revenue Heads Breakdown (Source Collections)
         $rulesBreakdownQuery = (clone $paymentQuery)
             ->select(
-                'revenue_rule_id',
+                'revenue_head_id',
                 DB::raw('SUM(amount) as total_collected'),
                 DB::raw('COUNT(id) as payment_count')
             )
-            ->groupBy('revenue_rule_id')
-            ->with('revenueRule')
+            ->groupBy('revenue_head_id')
+            ->with('revenueHead')
             ->get();
 
         $rulesBreakdown = $rulesBreakdownQuery->map(function ($row) {
             return [
-                'rule_name' => $row->revenueRule->name ?? 'Deleted Rule',
-                'rule_code' => $row->revenueRule->code ?? 'N/A',
+                'rule_name' => $row->revenueHead->name ?? 'Deleted Head',
+                'rule_code' => $row->revenueHead->code ?? 'N/A',
                 'amount' => (float) $row->total_collected,
                 'count' => (int) $row->payment_count,
             ];
@@ -102,6 +104,7 @@ class ReportController extends Controller
         return view('admin.reports.index', compact(
             'splits',
             'agencies',
+            'revenueHeads',
             'revenueRules',
             'totalGross',
             'totalNet',
@@ -199,11 +202,11 @@ class ReportController extends Controller
             $query->where('agency_id', $request->agency_id);
         }
 
-        // Filter by Revenue Rule
-        if ($request->filled('revenue_rule_id')) {
-            $ruleId = $request->revenue_rule_id;
-            $query->whereHas('payment', function($q) use ($ruleId) {
-                $q->where('revenue_rule_id', $ruleId);
+        // Filter by Revenue Head
+        if ($request->filled('revenue_head_id') || $request->filled('revenue_rule_id')) {
+            $headId = $request->input('revenue_head_id', $request->input('revenue_rule_id'));
+            $query->whereHas('payment', function($q) use ($headId) {
+                $q->where('revenue_head_id', $headId);
             });
         }
 
@@ -225,7 +228,7 @@ class ReportController extends Controller
     {
         $query = Payment::whereHas('establishment', function($q) {
             $q->areaRestricted();
-        })->where('status', 'success')->with(['revenueRule', 'establishment']);
+        })->where('status', 'success')->with(['revenueHead', 'establishment']);
 
         // Filter by Date Range
         if ($request->filled('date_range')) {
@@ -237,17 +240,18 @@ class ReportController extends Controller
             }
         }
 
-        // Filter by Agency (through RevenueRule)
+        // Filter by Agency (through RevenueHead)
         if ($request->filled('agency_id')) {
             $agencyId = $request->agency_id;
-            $query->whereHas('revenueRule', function($q) use ($agencyId) {
+            $query->whereHas('revenueHead', function($q) use ($agencyId) {
                 $q->where('agency_id', $agencyId);
             });
         }
 
-        // Filter by Revenue Rule
-        if ($request->filled('revenue_rule_id')) {
-            $query->where('revenue_rule_id', $request->revenue_rule_id);
+        // Filter by Revenue Head
+        if ($request->filled('revenue_head_id') || $request->filled('revenue_rule_id')) {
+            $headId = $request->input('revenue_head_id', $request->input('revenue_rule_id'));
+            $query->where('revenue_head_id', $headId);
         }
 
         // Filter by Gateway / Channel

@@ -118,7 +118,7 @@
                 <table class="w-full text-left">
                     <thead>
                         <tr class="border-b border-slate-100">
-                            <th class="pb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue Rule</th>
+                            <th class="pb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue Head</th>
                             <th class="pb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Agency</th>
                             <th class="pb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Period</th>
                             <th class="pb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Amount</th>
@@ -127,7 +127,7 @@
                     <tbody class="divide-y divide-slate-50">
                         @foreach($invoice->items as $item)
                             <tr>
-                                <td class="py-3 text-xs font-bold text-slate-800">{{ $item->revenueRule->name ?? 'N/A' }}</td>
+                                <td class="py-3 text-xs font-bold text-slate-800">{{ $item->revenueHead->name ?? $item->revenueRule->name ?? 'N/A' }}</td>
                                 <td class="py-3">
                                     <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-[9px] font-black uppercase tracking-wider">
                                         {{ $item->agency->code ?? 'N/A' }}

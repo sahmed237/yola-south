@@ -125,14 +125,14 @@
                 </select>
             </div>
 
-            <!-- Revenue Rule -->
+            <!-- Revenue Head -->
             <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1 font-bold">Revenue Rule</label>
-                <select name="revenue_rule_id" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all font-bold text-slate-600">
-                    <option value="">-- All Revenue Rules --</option>
-                    @foreach($revenueRules as $rule)
-                        <option value="{{ $rule->id }}" {{ request('revenue_rule_id') == $rule->id ? 'selected' : '' }}>
-                            {{ $rule->name }} ({{ $rule->code }})
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1 font-bold">Revenue Head</label>
+                <select name="revenue_head_id" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all font-bold text-slate-600">
+                    <option value="">-- All Revenue Heads --</option>
+                    @foreach($revenueHeads ?? $revenueRules as $head)
+                        <option value="{{ $head->id }}" {{ request('revenue_head_id', request('revenue_rule_id')) == $head->id ? 'selected' : '' }}>
+                            {{ $head->name }} ({{ $head->code }})
                         </option>
                     @endforeach
                 </select>
@@ -155,7 +155,7 @@
                 <button type="submit" class="flex-1 py-3 bg-slate-800 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-900 transition-all text-center">
                     Apply Filter
                 </button>
-                @if(request()->anyFilled(['date_range', 'agency_id', 'revenue_rule_id', 'gateway']))
+                @if(request()->anyFilled(['date_range', 'agency_id', 'revenue_head_id', 'revenue_rule_id', 'gateway']))
                     <a href="{{ route('admin.reports.index') }}" class="px-5 py-3 bg-slate-100 text-slate-600 text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-200 transition-all text-center font-bold">
                         Clear
                     </a>
@@ -201,9 +201,9 @@
         </div>
     </div>
 
-    <!-- Revenue Rules Performance list -->
+    <!-- Revenue Heads Performance list -->
     <div class="lg:col-span-1 bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
-        <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">Revenue Rules Ranking</h3>
+        <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest mb-6">Revenue Heads Ranking</h3>
 
         <div class="space-y-5 max-h-[26rem] overflow-y-auto fancy-scroll pr-1">
             @forelse($rulesBreakdown as $ruleRow)

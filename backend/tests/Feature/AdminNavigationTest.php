@@ -24,10 +24,11 @@ class AdminNavigationTest extends TestCase
     {
         parent::setUp();
 
-        $this->manageUsersPermission = Permission::create(['name' => 'manage users']);
-        $this->manageRolesPermission = Permission::create(['name' => 'manage roles']);
-        $this->establishmentApprovalPermission = Permission::create(['name' => 'establishment approval']);
-        $this->adminRole = Role::create(['name' => 'admin-test']);
+        $this->manageUsersPermission = Permission::findOrCreate('manage users');
+        $this->manageRolesPermission = Permission::findOrCreate('manage roles');
+        $this->establishmentApprovalPermission = Permission::findOrCreate('establishment approval');
+        Permission::findOrCreate('view all invalid establishment');
+        $this->adminRole = Role::findOrCreate('admin-test');
     }
 
     public function test_navigation_links_hidden_for_unauthorized_users(): void
@@ -87,7 +88,7 @@ class AdminNavigationTest extends TestCase
 
     public function test_super_admin_has_full_setup_navigation_and_access(): void
     {
-        $superAdminRole = Role::create(['name' => 'super-admin']);
+        $superAdminRole = Role::findOrCreate('super-admin');
         $superAdmin = User::factory()->create();
         $superAdmin->assignRole($superAdminRole);
 
@@ -171,8 +172,9 @@ class AdminNavigationTest extends TestCase
         $response = $this->actingAs($user1)->get('/admin/dashboard');
         $response->assertOk();
         // Should only see count of 1 (their own)
-        $response->assertSee('1');
-        $response->assertDontSee('2');
+        $response->assertSee('bg-red-600');
+        $this->assertMatchesRegularExpression('/bg-red-600[^>]*>\s*1\s*<\/span>/', $response->getContent());
+        $this->assertDoesNotMatchRegularExpression('/bg-red-600[^>]*>\s*2\s*<\/span>/', $response->getContent());
 
         // 2. Grant permission and check again
         $role = Role::create(['name' => 'admin-invalid-test']);
@@ -183,7 +185,7 @@ class AdminNavigationTest extends TestCase
         $response = $this->actingAs($user1)->get('/admin/dashboard');
         $response->assertOk();
         // Should see count of 2 (all rejected)
-        $response->assertSee('2');
+        $this->assertMatchesRegularExpression('/bg-red-600[^>]*>\s*2\s*<\/span>/', $response->getContent());
     }
 
     public function test_pending_approvals_badge_count(): void

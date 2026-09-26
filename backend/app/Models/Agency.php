@@ -28,9 +28,14 @@ class Agency extends Model
         'service_fee_amount' => 'decimal:2',
     ];
 
+    public function revenueHeads()
+    {
+        return $this->hasMany(RevenueHead::class);
+    }
+
     public function revenueRules()
     {
-        return $this->hasMany(RevenueRule::class);
+        return $this->revenueHeads();
     }
 
     public function paystackSubAccount()

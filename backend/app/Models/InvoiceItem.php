@@ -11,7 +11,7 @@ class InvoiceItem extends Model
 
     protected $fillable = [
         'invoice_id',
-        'revenue_rule_id',
+        'revenue_head_id',
         'agency_id',
         'period',
         'amount',
@@ -26,9 +26,14 @@ class InvoiceItem extends Model
         return $this->belongsTo(Invoice::class);
     }
 
+    public function revenueHead()
+    {
+        return $this->belongsTo(RevenueHead::class, 'revenue_head_id');
+    }
+
     public function revenueRule()
     {
-        return $this->belongsTo(RevenueRule::class);
+        return $this->revenueHead();
     }
 
     public function agency()

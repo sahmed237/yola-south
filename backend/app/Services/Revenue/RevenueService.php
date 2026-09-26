@@ -3,6 +3,7 @@
 namespace App\Services\Revenue;
 
 use App\Models\Establishment;
+use App\Models\RevenueHead;
 use App\Models\RevenueRule;
 use App\Models\Agency;
 use App\Models\Payment;
@@ -15,7 +16,7 @@ class RevenueService
      */
     public function calculateFees(Establishment $establishment): array
     {
-        $rules = RevenueRule::active()->with('agency')->get();
+        $rules = RevenueHead::active()->with('agency')->get();
         $fees = [];
         $total = 0;
 
@@ -41,7 +42,7 @@ class RevenueService
 
     public function getEstablishmentTaxStatus(Establishment $establishment): array
     {
-        $rules = RevenueRule::active()->with('agency')->get();
+        $rules = RevenueHead::active()->with('agency')->get();
         $feeDetails = [];
         $totalDue = 0;
         $totalPaid = 0;
@@ -127,7 +128,7 @@ class RevenueService
                         $q->where('establishment_id', $establishment->id)
                           ->where('status', 'success');
                     })
-                    ->where('revenue_rule_id', $rule->id)
+                    ->where('revenue_head_id', $rule->id)
                     ->where('period', $period['label'])
                     ->sum('amount');
 
@@ -141,6 +142,8 @@ class RevenueService
                 }
 
                 $feeDetails[] = [
+                    'head_id'            => $rule->id,
+                    'head_name'          => $rule->name,
                     'rule_id'            => $rule->id,
                     'rule_name'          => $rule->name,
                     'agency_id'          => $rule->agency_id,

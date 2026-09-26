@@ -9,6 +9,7 @@ use App\Models\InvoiceItem;
 use App\Models\InvoiceSplit;
 use App\Models\Payment;
 use App\Models\PaymentSplit;
+use App\Models\RevenueHead;
 use App\Models\RevenueRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,7 @@ class PublicEstablishmentController extends Controller
      */
     public function landing(Request $request)
     {
-        $totalRules           = RevenueRule::active()->count();
+        $totalRules           = RevenueHead::active()->count();
         $totalEstablishments  = Establishment::where('status', 'approved')->count();
         $totalRevenue         = Payment::where('status', 'success')->sum('amount');
 
@@ -264,11 +265,11 @@ class PublicEstablishmentController extends Controller
                 ]
             ]);
 
-            // One row per revenue rule line
+            // One row per revenue head line
             foreach ($items as $item) {
                 InvoiceItem::create([
                     'invoice_id'      => $invoice->id,
-                    'revenue_rule_id' => $item['rule_id'],
+                    'revenue_head_id' => $item['head_id'] ?? $item['rule_id'],
                     'agency_id'       => $item['agency_id'],
                     'period'          => $item['period'],
                     'amount'          => (float) $item['amount'],
@@ -291,7 +292,7 @@ class PublicEstablishmentController extends Controller
         });
 
         // Eager-load relations for the checkout view
-        $invoice->load(['items.revenueRule', 'items.agency', 'splits.agency', 'establishment.occupant']);
+        $invoice->load(['items.revenueHead', 'items.revenueRule', 'items.agency', 'splits.agency', 'establishment.occupant']);
 
         // --- 4. Initialize Payment Gateway ----------------------------------
         try {
@@ -332,7 +333,7 @@ class PublicEstablishmentController extends Controller
      */
     public function success(Request $request, $reference)
     {
-        $invoice       = Invoice::with(['items.revenueRule', 'items.agency', 'splits.agency', 'establishment.occupant'])->where('reference', $reference)->firstOrFail();
+        $invoice       = Invoice::with(['items.revenueHead', 'items.revenueRule', 'items.agency', 'splits.agency', 'establishment.occupant'])->where('reference', $reference)->firstOrFail();
         $establishment = $invoice->establishment;
 
         // If the request wants JSON, perform the actual verification
@@ -423,13 +424,13 @@ class PublicEstablishmentController extends Controller
                             'payment_fee' => $actualFee
                         ]);
 
-                        // 2. Insert one Payment per invoice item (one per revenue rule line)
+                        // 2. Insert one Payment per invoice item (one per revenue head line)
                         $payments = [];
                         foreach ($invoice->items as $item) {
                             $payment = Payment::create([
                                 'invoice_id'      => $invoice->id,
                                 'establishment_id'=> $establishment->id,
-                                'revenue_rule_id' => $item->revenue_rule_id,
+                                'revenue_head_id' => $item->revenue_head_id ?? $item->revenue_rule_id,
                                 'amount'          => $item->amount,
                                 'status'          => 'success',
                                 'reference'       => $invoice->reference . '-' . $item->id,
@@ -512,7 +513,7 @@ class PublicEstablishmentController extends Controller
      */
     public function verifyReceipt($reference)
     {
-        $invoice = Invoice::with(['items.revenueRule', 'items.agency', 'splits.agency', 'establishment.occupant'])
+        $invoice = Invoice::with(['items.revenueHead', 'items.revenueRule', 'items.agency', 'splits.agency', 'establishment.occupant'])
             ->where('reference', $reference)
             ->first();
 

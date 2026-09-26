@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\PaymentSplit;
 use App\Models\Establishment;
+use App\Models\RevenueHead;
 use App\Models\RevenueRule;
 use App\Models\Agency;
 use App\Services\Revenue\RevenueService;
@@ -29,7 +30,7 @@ class PaymentController extends Controller
     {
         $query = Payment::whereHas('establishment', function($q) {
             $q->areaRestricted();
-        })->with(['establishment', 'revenueRule', 'revenueRule.agency']);
+        })->with(['establishment', 'revenueHead', 'revenueHead.agency']);
 
         // Search & Filter options
         if ($request->filled('search')) {
@@ -39,7 +40,7 @@ class PaymentController extends Controller
                   ->orWhereHas('establishment', function($estQuery) use ($search) {
                       $estQuery->where('name', 'like', '%' . $search . '%');
                   })
-                  ->orWhereHas('revenueRule', function($ruleQuery) use ($search) {
+                  ->orWhereHas('revenueHead', function($ruleQuery) use ($search) {
                       $ruleQuery->where('name', 'like', '%' . $search . '%');
                   });
             });
@@ -141,19 +142,21 @@ class PaymentController extends Controller
         $establishment = Establishment::areaRestricted()->findOrFail($id);
 
         $validated = $request->validate([
-            'revenue_rule_id' => 'required|exists:revenue_rules,id',
+            'revenue_head_id' => 'required_without:revenue_rule_id|nullable|exists:revenue_heads,id',
+            'revenue_rule_id' => 'nullable|exists:revenue_heads,id',
             'amount' => 'required|numeric|min:0.01',
             'gateway' => 'required|string|in:Bank Transfer',
             'reference' => 'required|string|unique:payments,reference',
         ]);
 
-        $rule = RevenueRule::findOrFail($validated['revenue_rule_id']);
+        $headId = $validated['revenue_head_id'] ?? $validated['revenue_rule_id'];
+        $head = RevenueHead::findOrFail($headId);
 
-        return DB::transaction(function() use ($validated, $establishment, $rule) {
+        return DB::transaction(function() use ($validated, $establishment, $head) {
             // 1. Create the Payment
             $payment = Payment::create([
                 'establishment_id' => $establishment->id,
-                'revenue_rule_id' => $rule->id,
+                'revenue_head_id' => $head->id,
                 'amount' => $validated['amount'],
                 'status' => 'success',
                 'reference' => $validated['reference'],
@@ -164,7 +167,7 @@ class PaymentController extends Controller
             // 2. Create the Payment Split for the associated Agency
             PaymentSplit::create([
                 'payment_id' => $payment->id,
-                'agency_id' => $rule->agency_id,
+                'agency_id' => $head->agency_id,
                 'amount' => $validated['amount'],
                 'is_service_fee' => false,
             ]);
@@ -174,10 +177,10 @@ class PaymentController extends Controller
                 'establishment_id' => $establishment->id,
                 'user_id' => auth()->id(),
                 'action_type' => 'payment_recorded',
-                'remarks' => "Recorded tax payment of ₦" . number_format($validated['amount'], 2) . " for '" . $rule->name . "' via " . $validated['gateway'] . ". Ref: " . $validated['reference']
+                'remarks' => "Recorded tax payment of ₦" . number_format($validated['amount'], 2) . " for '" . $head->name . "' via " . $validated['gateway'] . ". Ref: " . $validated['reference']
             ]);
 
-            return redirect()->back()->with('success', 'Tax payment of ₦' . number_format($validated['amount'], 2) . ' successfully recorded for ' . $rule->name . '!');
+            return redirect()->back()->with('success', 'Tax payment of ₦' . number_format($validated['amount'], 2) . ' successfully recorded for ' . $head->name . '!');
         });
     }
 
@@ -192,19 +195,21 @@ class PaymentController extends Controller
 
         $validated = $request->validate([
             'establishment_id' => 'required|exists:establishments,id',
-            'revenue_rule_id' => 'required|exists:revenue_rules,id',
+            'revenue_head_id' => 'required_without:revenue_rule_id|nullable|exists:revenue_heads,id',
+            'revenue_rule_id' => 'nullable|exists:revenue_heads,id',
             'amount' => 'required|numeric|min:0.01',
             'gateway' => 'required|string|in:Bank Transfer',
             'reference' => 'required|string|unique:payments,reference',
         ]);
 
         $establishment = Establishment::areaRestricted()->findOrFail($validated['establishment_id']);
-        $rule = RevenueRule::findOrFail($validated['revenue_rule_id']);
+        $headId = $validated['revenue_head_id'] ?? $validated['revenue_rule_id'];
+        $head = RevenueHead::findOrFail($headId);
 
-        return DB::transaction(function() use ($validated, $establishment, $rule) {
+        return DB::transaction(function() use ($validated, $establishment, $head) {
             $payment = Payment::create([
                 'establishment_id' => $establishment->id,
-                'revenue_rule_id' => $rule->id,
+                'revenue_head_id' => $head->id,
                 'amount' => $validated['amount'],
                 'status' => 'success',
                 'reference' => $validated['reference'],

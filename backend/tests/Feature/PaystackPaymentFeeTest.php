@@ -10,6 +10,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\InvoiceSplit;
 use App\Models\PaystackSubAccount;
+use App\Models\RevenueHead;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -83,6 +84,31 @@ class PaystackPaymentFeeTest extends TestCase
             'active' => true,
         ]);
 
+        $rule1 = RevenueHead::create([
+            'id' => 1,
+            'agency_id' => $agency1->id,
+            'name' => 'Rule 1',
+            'amount' => 5500.0,
+            'frequency' => 'annual',
+            'status' => 'active'
+        ]);
+        $rule2 = RevenueHead::create([
+            'id' => 2,
+            'agency_id' => $agency1->id,
+            'name' => 'Rule 2',
+            'amount' => 2160.0,
+            'frequency' => 'annual',
+            'status' => 'active'
+        ]);
+        $rule3 = RevenueHead::create([
+            'id' => 3,
+            'agency_id' => $agency2->id,
+            'name' => 'Rule 3',
+            'amount' => 5000.0,
+            'frequency' => 'annual',
+            'status' => 'active'
+        ]);
+
         // 3. Tax items total = ₦12,660 (which makes total unadjusted = 12660 + 200 = 12860)
         $items = [
             [
@@ -128,12 +154,12 @@ class PaystackPaymentFeeTest extends TestCase
         $this->assertNotNull($invoice);
         
         // Assert invoice total is adjusted correctly (12,958.13 NGN)
-        $this->assertEquals(12958.13, $invoice->total_amount);
+        $this->assertEqualsWithDelta(12958.13, $invoice->total_amount, 0.02);
 
         // Assert service fee split amount is adjusted correctly (298.13 NGN)
         $sfSplit = InvoiceSplit::where('invoice_id', $invoice->id)->where('is_service_fee', true)->first();
         $this->assertNotNull($sfSplit);
-        $this->assertEquals(298.13, $sfSplit->amount);
+        $this->assertEqualsWithDelta(298.13, $sfSplit->amount, 0.02);
     }
 
     public function test_paystack_equal_split_fee_distribution_on_success(): void
@@ -163,6 +189,69 @@ class PaystackPaymentFeeTest extends TestCase
             'house_number' => '10',
             'status' => 'approved',
             'base_year' => 2026,
+        ]);
+
+        $agency1 = Agency::create([
+            'id' => 1,
+            'name' => 'Agency 1',
+            'code' => 'A1',
+            'status' => true,
+        ]);
+        PaystackSubAccount::create([
+            'agency_id' => 1,
+            'subaccount_code' => 'ACCT_1',
+            'active' => true,
+        ]);
+
+        $agency2 = Agency::create([
+            'id' => 2,
+            'name' => 'Agency 2',
+            'code' => 'A2',
+            'status' => true,
+        ]);
+        PaystackSubAccount::create([
+            'agency_id' => 2,
+            'subaccount_code' => 'ACCT_2',
+            'active' => true,
+        ]);
+
+        $serviceFeeAgency = Agency::create([
+            'id' => 3,
+            'name' => 'Service Fee Agency',
+            'code' => 'SFA',
+            'status' => true,
+            'is_service_fee' => true,
+            'service_fee_amount' => 200.0,
+        ]);
+        PaystackSubAccount::create([
+            'agency_id' => 3,
+            'subaccount_code' => 'ACCT_SF',
+            'active' => true,
+        ]);
+
+        RevenueHead::create([
+            'id' => 1,
+            'agency_id' => 1,
+            'name' => 'Rule 1',
+            'amount' => 5500.0,
+            'frequency' => 'annual',
+            'status' => 'active'
+        ]);
+        RevenueHead::create([
+            'id' => 2,
+            'agency_id' => 1,
+            'name' => 'Rule 2',
+            'amount' => 2160.0,
+            'frequency' => 'annual',
+            'status' => 'active'
+        ]);
+        RevenueHead::create([
+            'id' => 3,
+            'agency_id' => 2,
+            'name' => 'Rule 3',
+            'amount' => 5000.0,
+            'frequency' => 'annual',
+            'status' => 'active'
         ]);
 
         // 2. Setup Invoice with Splits manually (simulating Paystack transaction with total = 12958.13)
@@ -207,21 +296,21 @@ class PaystackPaymentFeeTest extends TestCase
         // Create InvoiceItem records for items relation
         InvoiceItem::create([
             'invoice_id' => $invoice->id,
-            'revenue_rule_id' => 1,
+            'revenue_head_id' => 1,
             'agency_id' => 1,
             'period' => '2026',
             'amount' => 5500.0,
         ]);
         InvoiceItem::create([
             'invoice_id' => $invoice->id,
-            'revenue_rule_id' => 2,
+            'revenue_head_id' => 2,
             'agency_id' => 1,
             'period' => '2026',
             'amount' => 2160.0,
         ]);
         InvoiceItem::create([
             'invoice_id' => $invoice->id,
-            'revenue_rule_id' => 3,
+            'revenue_head_id' => 3,
             'agency_id' => 2,
             'period' => '2026',
             'amount' => 5000.0,

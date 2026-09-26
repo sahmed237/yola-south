@@ -172,7 +172,7 @@
                 <tr class="border-b border-slate-100 text-left">
                     <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Reference</th>
                     <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Establishment</th>
-                    <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue Rule</th>
+                    <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue Head</th>
                     <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Agency</th>
                     <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Amount</th>
                     <th class="pb-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Channel</th>
@@ -195,12 +195,12 @@
                         </td>
                         <td class="py-4">
                             <span class="px-2.5 py-1 bg-slate-100 rounded-lg text-[9px] font-black text-slate-600 uppercase tracking-wider">
-                                {{ $payment->revenueRule->name ?? 'Direct Split' }}
+                                {{ $payment->revenueHead->name ?? $payment->revenueRule->name ?? 'Direct Split' }}
                             </span>
                         </td>
                         <td class="py-4">
                             <span class="px-2.5 py-1 bg-indigo-50 rounded-lg text-[9px] font-black text-indigo-600 uppercase tracking-wider">
-                                {{ $payment->revenueRule->agency->code ?? 'N/A' }}
+                                {{ $payment->revenueHead->agency->code ?? $payment->revenueRule->agency->code ?? 'N/A' }}
                             </span>
                         </td>
                         <td class="py-4 text-xs font-black text-slate-800 text-right">₦{{ number_format($payment->amount, 2) }}</td>
@@ -305,11 +305,11 @@
                                 </select>
                             </div>
 
-                            <!-- Select Outstanding Rule -->
+                            <!-- Select Outstanding Head -->
                             <div x-show="activeEst" style="display: none;">
-                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Unpaid / Outstanding Rules</label>
-                                <select name="revenue_rule_id" x-model="selectedRuleId" @change="updateOutstanding()" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all font-bold text-slate-700">
-                                    <option value="">-- Choose Outstanding Rule --</option>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Unpaid / Outstanding Heads</label>
+                                <select name="revenue_head_id" x-model="selectedRuleId" @change="updateOutstanding()" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all font-bold text-slate-700">
+                                    <option value="">-- Choose Outstanding Head --</option>
                                     <template x-if="activeEst">
                                         <template x-for="rule in activeEst.rules" :key="rule.rule_id">
                                             <option :value="rule.rule_id" x-text="rule.rule_name + ' (Outstanding: ₦' + rule.outstanding_amount.toLocaleString() + ')'"></option>

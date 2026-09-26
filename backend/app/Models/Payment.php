@@ -12,7 +12,7 @@ class Payment extends Model
     protected $fillable = [
         'invoice_id',
         'establishment_id',
-        'revenue_rule_id',
+        'revenue_head_id',
         'amount',
         'status',
         'reference',
@@ -35,9 +35,14 @@ class Payment extends Model
         return $this->belongsTo(Establishment::class);
     }
 
+    public function revenueHead()
+    {
+        return $this->belongsTo(RevenueHead::class, 'revenue_head_id');
+    }
+
     public function revenueRule()
     {
-        return $this->belongsTo(RevenueRule::class);
+        return $this->revenueHead();
     }
 
     public function splits()

@@ -197,7 +197,7 @@
                     </div>
                     <div>
                         <h3 class="text-xl font-bold text-slate-800">Tax Assessment & Billing</h3>
-                        <p class="text-xs text-slate-400">Live evaluation of applicable revenue rules and outstanding liabilities.</p>
+                        <p class="text-xs text-slate-400">Live evaluation of applicable revenue heads and outstanding liabilities.</p>
                     </div>
                 </div>
                 <div class="text-right">
@@ -260,7 +260,7 @@
                     <table class="w-full">
                         <thead class="sticky top-0 z-10 bg-white">
                             <tr class="border-b border-slate-100 text-left">
-                                <th class="pb-4 pt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue Rule</th>
+                                <th class="pb-4 pt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue Head</th>
                                 <th class="pb-4 pt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Frequency</th>
                                 <th class="pb-4 pt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Period</th>
                                 <th class="pb-4 pt-1 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Assessment</th>
@@ -313,7 +313,7 @@
                                 <tr>
                                     <td colspan="8" class="py-12 text-center text-slate-400">
                                         <i data-lucide="receipt" class="w-12 h-12 mb-4 opacity-20 mx-auto block"></i>
-                                        <p class="text-sm font-bold uppercase tracking-widest">No applicable revenue rules</p>
+                                        <p class="text-sm font-bold uppercase tracking-widest">No applicable revenue heads</p>
                                     </td>
                                 </tr>
                             @endforelse
@@ -578,6 +578,7 @@
                             </div>
                         </div>
 
+                        <input type="hidden" name="revenue_head_id" :value="ruleId">
                         <input type="hidden" name="revenue_rule_id" :value="ruleId">
 
                         <div class="space-y-6">

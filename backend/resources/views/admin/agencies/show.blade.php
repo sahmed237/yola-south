@@ -117,7 +117,7 @@
             </div>
         </div>
 
-        <!-- Revenue Rules -->
+        <!-- Revenue Heads -->
         <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-4">
@@ -125,12 +125,12 @@
                         <i data-lucide="calculator" class="w-6 h-6"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-slate-800">Associated Revenue Rules</h3>
-                        <p class="text-xs text-slate-400">Rules linked to this agency for split payments.</p>
+                        <h3 class="text-lg font-bold text-slate-800">Associated Revenue Heads</h3>
+                        <p class="text-xs text-slate-400">Revenue heads linked to this agency for split payments.</p>
                     </div>
                 </div>
-                <a href="{{ route('admin.revenue-rules.create', ['agency_id' => $agency->id]) }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 uppercase tracking-wider flex items-center gap-1">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Create Rule
+                <a href="{{ route('admin.revenue-heads.create', ['agency_id' => $agency->id]) }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 uppercase tracking-wider flex items-center gap-1">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Create Head
                 </a>
             </div>
 
@@ -138,25 +138,25 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 rounded-xl">
-                            <th class="px-6 py-3">Rule Name</th>
+                            <th class="px-6 py-3">Head Name</th>
                             <th class="px-6 py-3">Base Amount</th>
                             <th class="px-6 py-3">Frequency</th>
                             <th class="px-6 py-3 text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">
-                        @forelse($agency->revenueRules as $rule)
+                        @forelse($agency->revenueHeads as $head)
                         <tr class="hover:bg-slate-50/50 transition-colors">
-                            <td class="px-6 py-4 font-bold text-slate-700 text-sm">{{ $rule->name }}</td>
-                            <td class="px-6 py-4 font-bold text-slate-600 text-sm">₦{{ number_format($rule->amount, 2) }}</td>
-                            <td class="px-6 py-4 text-xs font-medium text-slate-500 capitalize">{{ $rule->frequency }}</td>
+                            <td class="px-6 py-4 font-bold text-slate-700 text-sm">{{ $head->name }}</td>
+                            <td class="px-6 py-4 font-bold text-slate-600 text-sm">₦{{ number_format($head->amount, 2) }}</td>
+                            <td class="px-6 py-4 text-xs font-medium text-slate-500 capitalize">{{ $head->frequency }}</td>
                             <td class="px-6 py-4 text-right">
-                                <a href="{{ route('admin.revenue-rules.edit', $rule->id) }}" class="text-primary-600 hover:underline text-xs font-bold">Edit</a>
+                                <a href="{{ route('admin.revenue-heads.edit', $head->id) }}" class="text-primary-600 hover:underline text-xs font-bold">Edit</a>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-10 text-center text-slate-400 italic text-xs">No active revenue rules currently linked to this agency.</td>
+                            <td colspan="4" class="px-6 py-10 text-center text-slate-400 italic text-xs">No active revenue heads currently linked to this agency.</td>
                         </tr>
                         @endforelse
                     </tbody>

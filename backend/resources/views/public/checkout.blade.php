@@ -50,7 +50,7 @@
                     @foreach($invoice->items as $item)
                         <div class="flex justify-between items-center text-xs bg-slate-50 px-4 py-3 rounded-xl border border-slate-100">
                             <div>
-                                <span class="font-bold text-slate-800 block">{{ $item->revenueRule->name ?? '—' }}</span>
+                                <span class="font-bold text-slate-800 block">{{ $item->revenueHead->name ?? $item->revenueRule->name ?? '—' }}</span>
                                 <span class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">{{ $item->period }} · {{ $item->agency->name ?? '—' }}</span>
                             </div>
                             <span class="font-black text-slate-800">₦{{ number_format($item->amount, 2) }}</span>
