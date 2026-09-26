@@ -1,0 +1,6 @@
+{
+  "API_BASE_URL": "http://127.0.0.1:8080/api",
+  "APP_TITLE": "Taraba - URCS",
+  "APP_SUBTITLE": "Unified Revenue & Field Data Collector",
+  "APP_ORGANIZATION": "Department of Internal Revenue"
+}
