@@ -8,20 +8,13 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Montserrat:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&family=Outfit:wght@300;400;600;700&family=Lato:wght@300;400;700&family=Nunito:wght@300;400;600;700&family=Raleway:wght@300;400;600;700&family=Ubuntu:wght@300;400;500;700&family=Quicksand:wght@300;400;600;700&family=Fira+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Montserrat:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&family=Outfit:wght@300;400;600;700&family=Lato:wght@300;400;700&family=Nunito:wght@300;400;600;700&family=Raleway:wght@300;400;600;700&family=Ubuntu:wght@300;400;500;700&family=Quicksand:wght@300;400;600;700&family=Fira+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Alpine.js -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
         :root {
             --primary-color: {{ $system_settings['theme_primary_color'] ?? '#2563eb' }};
+            --brand: {{ $system_settings['theme_primary_color'] ?? '#2563eb' }};
+            --btn-radius: {{ $system_settings['theme_button_radius'] ?? '0.5rem' }};
             --sidebar-bg: {{ $system_settings['theme_sidebar_bg'] ?? '#0f172a' }};
             --sidebar-accent: {{ $system_settings['theme_sidebar_accent'] ?? '#1e293b' }};
             --sidebar-scrollbar: {{ $system_settings['theme_sidebar_scrollbar_color'] ?? 'rgba(255, 255, 255, 0.1)' }};
@@ -83,17 +76,39 @@
         }
     </style>
     
+    <!-- Console Theme Stylesheet (UI/index.html aesthetic) with Cache Busting -->
+    <link rel="stylesheet" href="{{ asset('css/console-theme.css') }}?v={{ file_exists(public_path('css/console-theme.css')) ? filemtime(public_path('css/console-theme.css')) : time() }}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
                         primary: {
-                            50: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}10',
-                            100: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}20',
+                            50: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}15',
+                            100: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}30',
+                            200: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}50',
+                            300: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}70',
+                            400: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}90',
                             500: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}',
                             600: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}',
+                            700: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}',
+                            800: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}',
+                            900: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}',
+                            DEFAULT: '{{ $system_settings['theme_primary_color'] ?? '#2563eb' }}',
                         },
+                    },
+                    borderRadius: {
+                        'btn': 'var(--btn-radius)',
                     }
                 }
             }
@@ -124,22 +139,22 @@
 
                 <!-- Nav Links -->
                 <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto fancy-scroll">
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.dashboard') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3"></i>
-                        Dashboard
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.dashboard') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Dashboard">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Dashboard</span>
                     </a>
                     
-                    <div class="pt-4 pb-2 text-xs font-semibold tracking-wider uppercase text-white/30">Revenue Management</div>
+                    <div class="pt-4 pb-2 text-xs font-semibold tracking-wider uppercase text-white/30">Establishments</div>
+                     <a href="{{ route('admin.establishments.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishments.index') || request()->routeIs('admin.establishments.create') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Establishments Management">
+                        <i data-lucide="store" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">All</span>
+                    </a>
                     @can('view all establishment')
-                    <a href="{{ route('admin.establishments.approved') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishments.approved') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="building-2" class="w-5 h-5 mr-3"></i>
-                        Approved Establishments
+                    <a href="{{ route('admin.establishments.approved') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishments.approved') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Approved Establishments">
+                        <i data-lucide="building-2" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Approved</span>
                     </a>
                     @endcan
-                    <a href="{{ route('admin.establishments.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishments.index') || request()->routeIs('admin.establishments.create') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="store" class="w-5 h-5 mr-3"></i>
-                        Establishment Management
-                    </a>
                     @php
                         $invalidCountQuery = \App\Models\Establishment::where('status', 'rejected');
                         if (auth()->check() && !auth()->user()->hasPermissionTo('view all invalid establishment')) {
@@ -147,57 +162,63 @@
                         }
                         $invalidCount = auth()->check() ? $invalidCountQuery->count() : 0;
                     @endphp
-                    <a href="{{ route('admin.establishments.invalid') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishments.invalid') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="x-square" class="w-5 h-5 mr-3"></i>
-                        Invalid Establishments
-                        @if($invalidCount > 0)
-                        <span class="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-red-600 text-white">
-                            {{ $invalidCount }}
-                        </span>
-                        @endif
-                    </a>
+                   
                     @can('establishment approval')
                     @php
                         $pendingApprovalsCount = \App\Models\Establishment::where('status', 'pending')->count();
                     @endphp
-                    <a href="{{ route('admin.approvals.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.approvals.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="check-circle" class="w-5 h-5 mr-3"></i>
-                        Establishment Approvals
+                    <a href="{{ route('admin.approvals.index') }}" class="flex items-center justify-between px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.approvals.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Establishment Approvals">
+                        <div class="flex items-center min-w-0">
+                            <i data-lucide="check-circle" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                            <span class="truncate whitespace-nowrap">Pending Approvals</span>
+                        </div>
                         @if($pendingApprovalsCount > 0)
-                        <span class="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-600 text-white">
+                        <span class="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-600 text-white flex-shrink-0">
                             {{ $pendingApprovalsCount }}
                         </span>
                         @endif
                     </a>
                     @endcan
+                     <a href="{{ route('admin.establishments.invalid') }}" class="flex items-center justify-between px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishments.invalid') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Invalid Establishments">
+                        <div class="flex items-center min-w-0">
+                            <i data-lucide="x-square" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                            <span class="truncate whitespace-nowrap">Invalid</span>
+                        </div>
+                        @if($invalidCount > 0)
+                        <span class="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-red-600 text-white flex-shrink-0">
+                            {{ $invalidCount }}
+                        </span>
+                        @endif
+                    </a>
                     @can('approve establishment update')
-                    <a href="{{ route('admin.establishment-update-requests.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishment-update-requests.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="refresh-cw" class="w-5 h-5 mr-3"></i>
-                        Update Requests
+                    <a href="{{ route('admin.establishment-update-requests.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishment-update-requests.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Update Requests">
+                        <i data-lucide="refresh-cw" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Update Requests</span>
                     </a>
                     @endcan
+                    <div class="pt-4 pb-2 text-xs font-semibold tracking-wider uppercase text-white/30">Revenue Management</div>
                      @can('view unpaid taxes')
-                    <a href="{{ route('admin.establishments.unpaid') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishments.unpaid') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="wallet" class="w-5 h-5 mr-3"></i>
-                        Unpaid Taxes
+                    <a href="{{ route('admin.establishments.unpaid') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishments.unpaid') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Unpaid Taxes">
+                        <i data-lucide="wallet" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Unpaid Taxes</span>
                     </a>
                     @endcan
                     @can('view invoice')
-                    <a href="{{ route('admin.invoices.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.invoices.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="receipt" class="w-5 h-5 mr-3"></i>
-                        Invoices
+                    <a href="{{ route('admin.invoices.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.invoices.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Invoices">
+                        <i data-lucide="receipt" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Invoices</span>
                     </a>
                     @endcan
                     @canany(['view payments', 'view payment'])
-                    <a href="{{ route('admin.payments.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.payments.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="credit-card" class="w-5 h-5 mr-3"></i>
-                        Payments
+                    <a href="{{ route('admin.payments.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.payments.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Payments">
+                        <i data-lucide="credit-card" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Payments</span>
                     </a>
                     @endcanany
                     @can('view report')
-                    <a href="{{ route('admin.reports.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.reports.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="bar-chart-3" class="w-5 h-5 mr-3"></i>
-                        Reports
+                    <a href="{{ route('admin.reports.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.reports.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Reports">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Reports</span>
                     </a>
                     @endcan
 
@@ -205,33 +226,33 @@
                     <div class="pt-4 pb-2 text-xs font-semibold tracking-wider uppercase text-white/30">System Setup</div>
                     @endif
                     @can('manage faq')
-                    <a href="{{ route('admin.faqs.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.faqs.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="help-circle" class="w-5 h-5 mr-3"></i>
-                        Manage FAQs
+                    <a href="{{ route('admin.faqs.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.faqs.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Manage FAQs">
+                        <i data-lucide="help-circle" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Manage FAQs</span>
                     </a>
                     @endcan
                     @role('super-admin')
-                    <a href="{{ route('admin.setup.establishment-types.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.setup.establishment-types.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="tag" class="w-5 h-5 mr-3"></i>
-                        Establishment Types
+                    <a href="{{ route('admin.setup.establishment-types.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.setup.establishment-types.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Establishment Types">
+                        <i data-lucide="tag" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Types</span>
                     </a>
-                    <a href="{{ route('admin.setup.establishment-sizes.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.setup.establishment-sizes.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="maximize" class="w-5 h-5 mr-3"></i>
-                        Establishment Sizes
+                    <a href="{{ route('admin.setup.establishment-sizes.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.setup.establishment-sizes.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Establishment Sizes">
+                        <i data-lucide="maximize" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Sizes</span>
                     </a>
                     @endrole
                     @role('super-admin')
-                    <a href="{{ route('admin.agencies.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.agencies.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="building" class="w-5 h-5 mr-3"></i>
-                        Agencies
+                    <a href="{{ route('admin.agencies.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.agencies.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Agencies">
+                        <i data-lucide="building" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Agencies</span>
                     </a>
-                    <a href="{{ route('admin.service-fee-agencies.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.service-fee-agencies.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="percent" class="w-5 h-5 mr-3"></i>
-                        Service Fee Setup
+                    <a href="{{ route('admin.service-fee-agencies.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.service-fee-agencies.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Service Fee Setup">
+                        <i data-lucide="percent" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Service Fee Setup</span>
                     </a>
-                    <a href="{{ route('admin.revenue-heads.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.revenue-heads.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="calculator" class="w-5 h-5 mr-3"></i>
-                        Revenue Heads
+                    <a href="{{ route('admin.revenue-heads.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.revenue-heads.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Revenue Heads">
+                        <i data-lucide="calculator" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Revenue Heads</span>
                     </a>
                     @endrole
 
@@ -239,21 +260,21 @@
                     <div class="pt-4 pb-2 text-xs font-semibold tracking-wider uppercase text-white/30">Administration</div>
                     @endif
                     @can('manage users')
-                    <a href="{{ route('admin.users.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.users.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="users" class="w-5 h-5 mr-3"></i>
-                        User Management
+                    <a href="{{ route('admin.users.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.users.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="User Management">
+                        <i data-lucide="users" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">User Management</span>
                     </a>
                     @endcan
                     @can('manage roles')
-                    <a href="{{ route('admin.roles.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.roles.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="shield-check" class="w-5 h-5 mr-3"></i>
-                        Roles & Permissions
+                    <a href="{{ route('admin.roles.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.roles.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Roles & Permissions">
+                        <i data-lucide="shield-check" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Roles & Permissions</span>
                     </a>
                     @endcan
                     @role('super-admin')
-                    <a href="{{ route('admin.settings.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.settings.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}">
-                        <i data-lucide="settings" class="w-5 h-5 mr-3"></i>
-                        System Settings
+                    <a href="{{ route('admin.settings.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.settings.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="System Settings">
+                        <i data-lucide="settings" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">System Settings</span>
                     </a>
                     @endrole
                 </nav>
@@ -304,7 +325,7 @@
             </header>
 
             <!-- Page Content -->
-            <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 flex flex-col justify-between">
+            <div class="flex-1 overflow-y-auto p-6 flex flex-col justify-between console-content" style="background-color: var(--ground);">
                 <div class="max-w-7xl mx-auto w-full">
                     @yield('content')
                 </div>

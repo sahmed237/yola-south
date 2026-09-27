@@ -50,7 +50,7 @@ class AdminNavigationTest extends TestCase
         // Verify route access is denied
         $this->actingAs($user)->get('/admin/setup/establishment-types')->assertStatus(403);
         $this->actingAs($user)->get('/admin/setup/establishment-sizes')->assertStatus(403);
-        $this->actingAs($user)->get('/admin/approvals')->assertStatus(403);
+        $this->actingAs($user)->get(route('admin.approvals.index'))->assertStatus(403);
     }
 
     public function test_navigation_links_partially_visible_with_manage_users_permission(): void
@@ -117,7 +117,7 @@ class AdminNavigationTest extends TestCase
         $response->assertOk();
         $response->assertSee('Establishment Approvals');
         
-        $this->actingAs($user)->get('/admin/approvals')->assertOk();
+        $this->actingAs($user)->get(route('admin.approvals.index'))->assertOk();
     }
 
     public function test_invalid_establishment_badge_count(): void

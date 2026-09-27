@@ -71,6 +71,13 @@ Route::middleware(['auth', 'security_policy'])->prefix('admin')->group(function 
     Route::post('/profile/2fa/confirm', [ProfileController::class, 'confirmTwoFactor'])->name('admin.profile.2fa.confirm');
     Route::post('/profile/2fa/disable', [ProfileController::class, 'disableTwoFactor'])->name('admin.profile.2fa.disable');
 
+    // Establishment Approvals
+    Route::middleware('permission:establishment approval')->group(function () {
+        Route::get('/establishments/approvals', [EstablishmentApprovalController::class, 'index'])->name('admin.approvals.index');
+        Route::get('/establishments/approvals/{id}', [EstablishmentApprovalController::class, 'show'])->whereNumber('id')->name('admin.approvals.show');
+        Route::post('/establishments/approvals/{id}/process', [EstablishmentApprovalController::class, 'process'])->whereNumber('id')->name('admin.approvals.process');
+    });
+
     // Establishment Management (CRUD)
     Route::get('/establishments', [EstablishmentController::class, 'index'])->name('admin.establishments.index');
     Route::get('/establishments/approved', [EstablishmentController::class, 'approved'])->name('admin.establishments.approved');
@@ -78,18 +85,11 @@ Route::middleware(['auth', 'security_policy'])->prefix('admin')->group(function 
     Route::get('/establishments/unpaid', [EstablishmentController::class, 'unpaid'])->name('admin.establishments.unpaid');
     Route::get('/establishments/create', [EstablishmentController::class, 'create'])->name('admin.establishments.create');
     Route::post('/establishments', [EstablishmentController::class, 'store'])->name('admin.establishments.store');
-    Route::get('/establishments/{id}/edit', [EstablishmentController::class, 'edit'])->name('admin.establishments.edit');
-    Route::put('/establishments/{id}', [EstablishmentController::class, 'update'])->name('admin.establishments.update');
-    Route::get('/establishments/{id}', [EstablishmentController::class, 'show'])->name('admin.establishments.show');
-    Route::get('/establishments/{id}/details', [EstablishmentController::class, 'details'])->name('admin.establishments.details');
-    Route::delete('/establishments/{id}', [EstablishmentController::class, 'destroy'])->name('admin.establishments.destroy');
-
-    // Establishment Approvals
-    Route::middleware('permission:establishment approval')->group(function () {
-        Route::get('/approvals', [EstablishmentApprovalController::class, 'index'])->name('admin.approvals.index');
-        Route::get('/approvals/{id}', [EstablishmentApprovalController::class, 'show'])->name('admin.approvals.show');
-        Route::post('/approvals/{id}/process', [EstablishmentApprovalController::class, 'process'])->name('admin.approvals.process');
-    });
+    Route::get('/establishments/{id}/edit', [EstablishmentController::class, 'edit'])->whereNumber('id')->name('admin.establishments.edit');
+    Route::put('/establishments/{id}', [EstablishmentController::class, 'update'])->whereNumber('id')->name('admin.establishments.update');
+    Route::get('/establishments/{id}', [EstablishmentController::class, 'show'])->whereNumber('id')->name('admin.establishments.show');
+    Route::get('/establishments/{id}/details', [EstablishmentController::class, 'details'])->whereNumber('id')->name('admin.establishments.details');
+    Route::delete('/establishments/{id}', [EstablishmentController::class, 'destroy'])->whereNumber('id')->name('admin.establishments.destroy');
 
     // Owner Lookup API (Internal)
     Route::get('/owners/search', [\App\Http\Controllers\Api\V1\OwnerLookupController::class, 'search'])->name('admin.owners.search');
@@ -136,11 +136,11 @@ Route::middleware(['auth', 'security_policy'])->prefix('admin')->group(function 
     });
     
     // Establishment Update Requests
-    Route::get('/establishment-update-requests', [\App\Http\Controllers\Admin\EstablishmentUpdateRequestController::class, 'index'])->name('admin.establishment-update-requests.index');
-    Route::get('/establishment-update-requests/{id}', [\App\Http\Controllers\Admin\EstablishmentUpdateRequestController::class, 'show'])->name('admin.establishment-update-requests.show');
+    Route::get('/establishment/update-requests', [\App\Http\Controllers\Admin\EstablishmentUpdateRequestController::class, 'index'])->name('admin.establishment-update-requests.index');
+    Route::get('/establishment/update-requests/{id}', [\App\Http\Controllers\Admin\EstablishmentUpdateRequestController::class, 'show'])->name('admin.establishment-update-requests.show');
     Route::post('/establishments/{id}/request-update', [\App\Http\Controllers\Admin\EstablishmentUpdateRequestController::class, 'store'])->name('admin.establishments.request-update');
-    Route::post('/establishment-update-requests/{id}/approve', [\App\Http\Controllers\Admin\EstablishmentUpdateRequestController::class, 'approve'])->name('admin.establishment-update-requests.approve');
-    Route::post('/establishment-update-requests/{id}/reject', [\App\Http\Controllers\Admin\EstablishmentUpdateRequestController::class, 'reject'])->name('admin.establishment-update-requests.reject');
+    Route::post('/establishment/update-requests/{id}/approve', [\App\Http\Controllers\Admin\EstablishmentUpdateRequestController::class, 'approve'])->name('admin.establishment-update-requests.approve');
+    Route::post('/establishment/update-requests/{id}/reject', [\App\Http\Controllers\Admin\EstablishmentUpdateRequestController::class, 'reject'])->name('admin.establishment-update-requests.reject');
 
     // Invoices Management
     Route::middleware(['can:view invoice'])->group(function () {

@@ -548,7 +548,7 @@ html, body {
         <div style="display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 6px">
           <label class="lb" for="si-pass" style="margin:0">Password</label>
           @if(($system_settings['user_can_forget_password'] ?? '1') == '1')
-            <a href="{{ route('password.request') }}" class="forgot-link">Forgot password?</a>
+            <a href="{{ route('password.request') }}" class="forgot-link" tabindex="-1">Forgot password?</a>
           @else
             <span style="font-size:10.5px;color:var(--ink-3);cursor:help" title="Password reset via self-service is disabled. Please contact the ICT unit.">Forgot password? Contact ICT</span>
           @endif
@@ -556,7 +556,7 @@ html, body {
         <div class="inp" x-data="{ show: false }">
           <svg class="icon"><use href="#i-lock"/></svg>
           <input id="si-pass" :type="show ? 'text' : 'password'" name="password" required autocomplete="current-password" placeholder="••••••••" style="flex:1">
-          <button type="button" @click="show = !show" class="toggle-eye" aria-label="Toggle password visibility">
+          <button type="button" @click="show = !show" class="toggle-eye" aria-label="Toggle password visibility" tabindex="-1">
             <svg class="icon" x-show="!show"><use href="#i-eye"/></svg>
             <svg class="icon" x-show="show" style="display:none"><use href="#i-eye-off"/></svg>
           </button>

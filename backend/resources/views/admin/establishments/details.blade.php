@@ -186,10 +186,256 @@
         </div>
     </div>
 
-    <!-- Right Column: Detailed Info Sections -->
-    <div class="lg:col-span-2 space-y-8">
-        <!-- Tax Assessment & Billing -->
-        <div id="tax-assessment" class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-10 relative overflow-hidden" x-data="{ openPayModal: false }">
+    <!-- Right Column: Tabbed Sections -->
+    <div class="lg:col-span-2 space-y-6" 
+         x-data="{
+             activeTab: (function() {
+                 const h = window.location.hash.replace('#', '');
+                 if (h === 'tax-assessment' || h === 'billing') return 'billing';
+                 if (h === 'audit-trail' || h === 'audit') return 'audit';
+                 if (h === 'establishment-info' || h === 'info') return 'info';
+                 return 'info';
+             })(),
+             setTab(tab) {
+                 this.activeTab = tab;
+                 window.location.hash = tab === 'billing' ? 'tax-assessment' : (tab === 'audit' ? 'audit-trail' : 'establishment-info');
+                 if (tab === 'info') {
+                     setTimeout(() => {
+                         if (window.leafletMap) window.leafletMap.invalidateSize();
+                     }, 150);
+                 }
+                 this.$nextTick(() => {
+                     if (window.lucide) lucide.createIcons();
+                 });
+             }
+         }"
+         x-init="$watch('activeTab', tab => {
+             if (tab === 'info') {
+                 setTimeout(() => {
+                     if (window.leafletMap) window.leafletMap.invalidateSize();
+                 }, 150);
+             }
+         })">
+
+        <!-- Navigation Tabs Bar -->
+        <div class="bg-white p-2 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-wrap items-center justify-between gap-2 print:hidden">
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <!-- Tab 1: Establishment Info -->
+                <button type="button" @click="setTab('info')"
+                    :class="activeTab === 'info' 
+                        ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' 
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+                    class="px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2">
+                    <i data-lucide="store" class="w-4 h-4"></i>
+                    <span>Info</span>
+                </button>
+
+                <!-- Tab 2: Tax Assessment & Billing -->
+                <button type="button" @click="setTab('billing')"
+                    :class="activeTab === 'billing' 
+                        ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' 
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+                    class="px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2">
+                    <i data-lucide="receipt" class="w-4 h-4"></i>
+                    <span>Billing</span>
+                    @if($taxStatus['totals']['outstanding'] > 0)
+                        <span :class="activeTab === 'billing' ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-700'" class="px-2 py-0.5 rounded-full text-[10px] font-bold">
+                            ₦{{ number_format($taxStatus['totals']['outstanding']) }}
+                        </span>
+                    @else
+                        <span :class="activeTab === 'billing' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-700'" class="px-2 py-0.5 rounded-full text-[10px] font-bold">
+                            Paid
+                        </span>
+                    @endif
+                </button>
+
+                <!-- Tab 3: Audit Trail -->
+                <button type="button" @click="setTab('audit')"
+                    :class="activeTab === 'audit' 
+                        ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25' 
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'"
+                    class="px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2">
+                    <i data-lucide="history" class="w-4 h-4"></i>
+                    <span>Audit Trail</span>
+                    @if($establishment->activityLogs->count() > 0)
+                        <span :class="activeTab === 'audit' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'" class="px-2 py-0.5 rounded-full text-[10px] font-bold">
+                            {{ $establishment->activityLogs->count() }}
+                        </span>
+                    @endif
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 1: ESTABLISHMENT INFO ==================== -->
+        <div x-show="activeTab === 'info'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6 print:!block">
+            <!-- Physical Address & Map Card -->
+            <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                            <i data-lucide="map-pin" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Physical Address &amp; Location</h3>
+                            <p class="text-xs text-slate-400">Street location, coordinates, and geospatial boundary.</p>
+                        </div>
+                    </div>
+                    <span class="px-3.5 py-1.5 bg-slate-100 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-600 border border-slate-200">
+                        {{ $establishment->inside_metropolis ? 'Metropolitan Area' : 'Outside Metropolis' }}
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-8 bg-slate-50/80 p-6 rounded-2xl border border-slate-100">
+                    <div class="col-span-2">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Street Address</p>
+                        <p class="text-sm font-bold text-slate-800">{{ $establishment->street_address ?? 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">House / Unit No.</p>
+                        <p class="text-sm font-bold text-slate-800">{{ $establishment->house_number ?? 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">City / Town</p>
+                        <p class="text-sm font-bold text-slate-800">{{ $establishment->city ?? 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Postal Code</p>
+                        <p class="text-sm font-bold text-slate-800">{{ $establishment->postal_code ?? 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Latitude</p>
+                        <p class="text-sm font-bold text-slate-800 font-mono">{{ $establishment->lat ?? 'N/A' }}</p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Longitude</p>
+                        <p class="text-sm font-bold text-slate-800 font-mono">{{ $establishment->lng ?? 'N/A' }}</p>
+                    </div>
+                </div>
+
+                <!-- Interactive Map -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <i data-lucide="globe" class="w-3.5 h-3.5 text-emerald-600"></i>
+                            Geospatial Satellite &amp; Street Map
+                        </span>
+                        <span class="text-[10px] font-medium text-slate-400">Interactive coordinates locator</span>
+                    </div>
+                    <div id="map" class="w-full h-64 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner z-0"></div>
+                </div>
+            </div>
+
+            <!-- Occupant & Owner Profiles (Side-by-Side Cards) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Occupant Profile -->
+                <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-500">
+                            <i data-lucide="user" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">Occupant Profile</h3>
+                            <p class="text-xs text-slate-400">Current business operator</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 bg-slate-50/80 p-6 rounded-2xl border border-slate-100">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Full Name</p>
+                            <p class="text-sm font-bold text-slate-800">{{ $establishment->occupant->name ?? 'Not Available' }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Phone Number</p>
+                            <p class="text-sm font-bold text-slate-800 font-mono">{{ $establishment->occupant->phone ?? 'Not Available' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Owner Profile -->
+                <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600">
+                            <i data-lucide="briefcase" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">Owner Profile</h3>
+                            <p class="text-xs text-slate-400">Property / asset owner</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 bg-slate-50/80 p-6 rounded-2xl border border-slate-100">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Owner Name</p>
+                            <p class="text-sm font-bold text-slate-800">{{ $establishment->owner->name ?? 'Not Available' }}</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">NIN</p>
+                                <p class="text-sm font-bold text-slate-800 font-mono">{{ $establishment->owner->nin ?? 'N/A' }}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Phone</p>
+                                <p class="text-sm font-bold text-slate-800 font-mono">{{ $establishment->owner->phone ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+                        @if(!empty($establishment->owner->email))
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Email</p>
+                            <p class="text-xs font-semibold text-slate-600">{{ $establishment->owner->email }}</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Establishment Photo Gallery -->
+            <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500">
+                            <i data-lucide="camera" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">Establishment Photo Gallery</h3>
+                            <p class="text-xs text-slate-400">Enumeration site verification photographs</p>
+                        </div>
+                    </div>
+                    <span class="px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                        {{ $establishment->images->count() }} Photos
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    @forelse($establishment->images as $image)
+                        <div class="group relative aspect-square rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 shadow-sm transition-all hover:shadow-xl">
+                            <img src="{{ Storage::url($image->image_path) }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                                <p class="text-white text-[10px] font-black uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                                    <i data-lucide="map-pin" class="w-3 h-3 text-emerald-400"></i>
+                                    Geotag Info
+                                </p>
+                                <div class="text-white/80 text-[9px] font-medium leading-tight">
+                                    <p>LAT: {{ $image->lat }}</p>
+                                    <p>LNG: {{ $image->lng }}</p>
+                                    <p class="mt-1 text-white/60 truncate" title="{{ $image->device_info }}">
+                                        {{ Str::limit($image->device_info, 30) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-span-full py-10 flex flex-col items-center justify-center text-slate-400 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-100">
+                            <i data-lucide="image-off" class="w-10 h-10 mb-2 opacity-20"></i>
+                            <p class="text-xs font-bold uppercase tracking-widest">No verification images uploaded</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: TAX ASSESSMENT & BILLING ==================== -->
+        <div x-show="activeTab === 'billing'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6 print:!block" id="tax-assessment" x-data="{ openPayModal: false }">
+            <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10 relative overflow-hidden">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 bg-primary-50 rounded-2xl flex items-center justify-center text-primary-600">
@@ -356,200 +602,79 @@
             @endif
         </div>
 
-        <!-- Physical Address Details -->
-        <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-10">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500">
-                    <i data-lucide="map" class="w-6 h-6"></i>
-                </div>
-                <h3 class="text-xl font-bold text-slate-800">Physical Address</h3>
-            </div>
-
-            <div class="grid grid-cols-2 gap-8">
-                <div class="col-span-2">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Street Address</p>
-                    <p class="text-base font-bold text-slate-800">{{ $establishment->street_address }}</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">House/Establishment Number</p>
-                    <p class="text-base font-bold text-slate-800">{{ $establishment->house_number }}</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">City</p>
-                    <p class="text-base font-bold text-slate-800">{{ $establishment->city }}</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Postal Code</p>
-                    <p class="text-base font-bold text-slate-800">{{ $establishment->postal_code }}</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Metropolis Status</p>
-                    <p class="text-base font-bold text-slate-800">{{ $establishment->inside_metropolis ? 'Within City Limits' : 'Outside City Limits' }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Establishment Gallery -->
-        <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-10">
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-500">
-                        <i data-lucide="camera" class="w-6 h-6"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800">Establishment Gallery</h3>
-                </div>
-                <span class="px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                    {{ $establishment->images->count() }} Photos
-                </span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                @forelse($establishment->images as $image)
-                    <div class="group relative aspect-square rounded-[2rem] overflow-hidden border border-slate-100 bg-slate-50 shadow-sm transition-all hover:shadow-xl">
-                        <img src="{{ Storage::url($image->image_path) }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6">
-                            <p class="text-white text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <i data-lucide="map-pin" class="w-3 h-3"></i>
-                                Geotag Info
-                            </p>
-                            <div class="text-white/80 text-[9px] font-medium leading-relaxed">
-                                <p>LAT: {{ $image->lat }}</p>
-                                <p>LNG: {{ $image->lng }}</p>
-                                <p class="mt-2 text-white/60 truncate" title="{{ $image->device_info }}">
-                                    {{ Str::limit($image->device_info, 40) }}
-                                </p>
-                            </div>
+        <!-- ==================== TAB 3: AUDIT TRAIL ==================== -->
+        <div x-show="activeTab === 'audit'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" class="space-y-6 print:!block" id="audit-trail">
+            <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10">
+                <div class="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-600">
+                            <i data-lucide="history" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">Establishment Audit Trail</h3>
+                            <p class="text-xs text-slate-400">Complete historical timeline of registrations, verifications, updates, and approvals.</p>
                         </div>
                     </div>
-                @empty
-                    <div class="col-span-3 py-12 flex flex-col items-center justify-center text-slate-400 bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-100">
-                        <i data-lucide="image-off" class="w-12 h-12 mb-4 opacity-20"></i>
-                        <p class="text-sm font-bold uppercase tracking-widest">No images uploaded</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Geospatial Intelligence -->
-        <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-10">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500">
-                    <i data-lucide="globe" class="w-6 h-6"></i>
-                </div>
-                <h3 class="text-xl font-bold text-slate-800">Geospatial Intelligence</h3>
-            </div>
-
-            <div class="grid grid-cols-2 gap-8">
-                <div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Latitude</p>
-                    <p class="text-base font-bold text-slate-800 font-mono">{{ $establishment->lat }}</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Longitude</p>
-                    <p class="text-base font-bold text-slate-800 font-mono">{{ $establishment->lng }}</p>
-                </div>
-                <div class="col-span-2">
-                    <div id="map" class="w-full h-48 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Occupant Profile -->
-            <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-10">
-                <div class="flex items-center gap-4 mb-8">
-                    <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
-                        <i data-lucide="user" class="w-5 h-5"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800">Occupant Profile</h3>
+                    <span class="px-4 py-1.5 bg-slate-100 rounded-full text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                        {{ $establishment->activityLogs->count() }} Entries Recorded
+                    </span>
                 </div>
 
-                <div class="space-y-6">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Full Name</p>
-                        <p class="text-sm font-bold text-slate-800">{{ $establishment->occupant->name ?? 'Not Available' }}</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Phone Number</p>
-                        <p class="text-sm font-bold text-slate-800">{{ $establishment->occupant->phone ?? 'Not Available' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Owner Profile -->
-            <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-10">
-                <div class="flex items-center gap-4 mb-8">
-                    <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-500">
-                        <i data-lucide="briefcase" class="w-5 h-5"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-800">Owner Profile</h3>
-                </div>
-
-                <div class="space-y-6">
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Owner Name</p>
-                        <p class="text-sm font-bold text-slate-800">{{ $establishment->owner->name ?? 'Not Available' }}</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Identity (NIN)</p>
-                        <p class="text-sm font-bold text-slate-800">{{ $establishment->owner->nin ?? 'Not Available' }}</p>
-                    </div>
-                    <div>
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Contact Details</p>
-                        <p class="text-sm font-bold text-slate-800">{{ $establishment->owner->phone ?? '' }}</p>
-                        <p class="text-xs text-slate-500">{{ $establishment->owner->email ?? '' }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        @if($establishment->activityLogs->count() > 0)
-        <!-- Activity History -->
-        <div class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-10 print:hidden">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                    <i data-lucide="history" class="w-6 h-6"></i>
-                </div>
-                <h3 class="text-xl font-bold text-slate-800">Audit Trail</h3>
-            </div>
-
-            <div class="relative space-y-6 before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-slate-100">
-                @foreach($establishment->activityLogs as $log)
-                        <div class="relative flex items-start gap-4">
-                            <div class="w-10 h-10 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center shrink-0 z-10">
-                                @php
-                                    $color = match($log->action_type) {
-                                        'approved', 'update_authorized', 'update_completed' => 'bg-emerald-500',
-                                        'rejected', 'update_denied' => 'bg-red-500',
-                                        'update_requested' => 'bg-amber-500',
-                                        default => 'bg-primary-500',
-                                    };
-                                    $label = match($log->action_type) {
-                                        'registration_submitted' => 'Registration Submitted',
-                                        'approved' => 'Registration Approved',
-                                        'rejected' => 'Registration Rejected',
-                                        'update_requested' => 'Update Requested',
-                                        'update_authorized' => 'Update Authorized',
-                                        'update_denied' => 'Update Denied',
-                                        'update_completed' => 'Update Executed',
-                                        'updated' => 'Registration Corrected',
-                                        default => ucfirst(str_replace('_', ' ', $log->action_type)),
-                                    };
-                                @endphp
-                                <div class="w-2 h-2 rounded-full {{ $color }}"></div>
+                @if($establishment->activityLogs->count() > 0)
+                    <div class="relative space-y-6 before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-slate-200 pl-1">
+                        @foreach($establishment->activityLogs as $log)
+                            <div class="relative flex items-start gap-4 group">
+                                <div class="w-10 h-10 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center shrink-0 z-10">
+                                    @php
+                                        $color = match($log->action_type) {
+                                            'approved', 'update_authorized', 'update_completed' => 'bg-emerald-500',
+                                            'rejected', 'update_denied' => 'bg-rose-500',
+                                            'update_requested' => 'bg-amber-500',
+                                            default => 'bg-primary-500',
+                                        };
+                                        $label = match($log->action_type) {
+                                            'registration_submitted' => 'Registration Submitted',
+                                            'approved' => 'Registration Approved',
+                                            'rejected' => 'Registration Rejected',
+                                            'update_requested' => 'Update Requested',
+                                            'update_authorized' => 'Update Authorized',
+                                            'update_denied' => 'Update Denied',
+                                            'update_completed' => 'Update Executed',
+                                            'updated' => 'Registration Corrected',
+                                            default => ucfirst(str_replace('_', ' ', $log->action_type)),
+                                        };
+                                    @endphp
+                                    <div class="w-2.5 h-2.5 rounded-full {{ $color }}"></div>
+                                </div>
+                                <div class="pt-1 flex-1">
+                                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                                        <p class="text-sm font-bold text-slate-800 uppercase tracking-tight">{{ $label }}</p>
+                                        <span class="text-[10px] font-mono text-slate-400 font-medium">
+                                            {{ $log->created_at->format('M d, Y h:ia') }}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-slate-600 mt-1.5 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                                        {{ $log->remarks ?? 'No remarks recorded for this activity.' }}
+                                    </p>
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2 flex items-center gap-1.5">
+                                        <i data-lucide="user-check" class="w-3 h-3 text-slate-400"></i>
+                                        Action By: <span class="text-slate-600">{{ $log->user?->name ?? 'Public Portal / System' }}</span>
+                                    </p>
+                                </div>
                             </div>
-                            <div class="pt-1">
-                                <p class="text-sm font-bold text-slate-800 uppercase tracking-tight">{{ $label }}</p>
-                                <p class="text-xs text-slate-500 mt-0.5">{{ $log->remarks ?? 'No comments provided' }}</p>
-                                <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest mt-2">
-                                    {{ $log->user?->name ?? 'Public Portal' }} • {{ $log->created_at->format('M d, Y h:ia') }}
-                                </p>
-                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="py-12 flex flex-col items-center justify-center text-slate-400 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200/60">
+                        <div class="w-12 h-12 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 mb-3 shadow-sm">
+                            <i data-lucide="history" class="w-6 h-6"></i>
                         </div>
-                @endforeach
+                        <p class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-1">No Audit Logs Recorded</p>
+                        <p class="text-xs text-slate-400">Activity and status changes performed on this establishment will be tracked here.</p>
+                    </div>
+                @endif
             </div>
         </div>
-        @endif
     </div>
 </div>
 @endsection

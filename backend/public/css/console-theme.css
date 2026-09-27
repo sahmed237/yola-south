@@ -1,0 +1,616 @@
+/**
+ * YSLG-IMRS Console Theme Stylesheet
+ * Replicates the executive municipal design system from UI/index.html
+ * Dynamically binds to the system settings:
+ *  - Primary Color: var(--primary-color)
+ *  - Theme Button Radius: var(--btn-radius)
+ * Scoped to .console-content to style the main content area across all pages.
+ */
+
+:root {
+  /* UI/index.html color scheme */
+  --ground: #f1f4f0;
+  --surface: #ffffff;
+  --surface-2: #f9fbf8;
+  --sunken: #e8efe7;
+  --line: #dce4db;
+  --line-strong: #c3cfc1;
+  --ink: #111d16;
+  --ink-2: #4b5b52;
+  --ink-3: #77877d;
+
+  /* Brand colors bound dynamically to system settings primary color */
+  --brand: var(--primary-color, #2563eb);
+  --brand-strong: color-mix(in srgb, var(--brand) 85%, black);
+  --brand-soft: color-mix(in srgb, var(--brand) 12%, transparent);
+
+  --gold: #8f6b13;
+  --gold-soft: #f7efdb;
+
+  /* Semantic status colors (Approved=Good, Pending=Warn, Rejected=Crit) */
+  --good: #0f7a44;
+  --good-bg: #e3f0e7;
+  --warn: #8f5a00;
+  --warn-bg: #fbeed6;
+  --crit: #9d2124;
+  --crit-bg: #fae5e5;
+  --info: #1d5aa0;
+  --info-bg: #e4edf8;
+  --s1: #16824a;
+  --s2: #2a78d6;
+  --s3: #eda100;
+  --grid: #e6ece5;
+  --axis: #c9d4c7;
+
+  --shadow-1: 0 1px 2px rgba(17, 29, 22, 0.05);
+  --shadow-2: 0 4px 16px -4px rgba(17, 29, 22, 0.13), 0 1px 3px rgba(17, 29, 22, 0.06);
+  --shadow-doc: 0 12px 40px -12px rgba(17, 29, 22, 0.28), 0 2px 6px rgba(17, 29, 22, 0.08);
+
+  --r: 6px;
+  --r-lg: 10px;
+  --sans: "Archivo", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --serif: "Newsreader", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+/* ========================================================
+   CONTENT WRAPPER
+   ======================================================== */
+.console-content {
+  background-color: var(--ground) !important;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography */
+.console-content h1,
+.console-content h2,
+.console-content h3,
+.console-content h4,
+.console-content h5 {
+  font-family: var(--sans);
+  color: var(--ink) !important;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.console-content h1,
+.console-content .text-2xl.font-bold {
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  line-height: 1.25;
+}
+
+.console-content p {
+  color: var(--ink-2);
+}
+
+.console-content a {
+  color: var(--primary-color, #2563eb);
+}
+
+.console-content .text-slate-500,
+.console-content .text-slate-400,
+.console-content .text-gray-500 {
+  color: var(--ink-2) !important;
+  font-size: 13px;
+}
+
+.console-content .text-slate-800,
+.console-content .text-slate-700,
+.console-content .text-gray-800,
+.console-content .text-gray-700 {
+  color: var(--ink) !important;
+}
+
+/* Monospace & Tabular numbers */
+.console-content .mono,
+.console-content .num,
+.console-content .font-mono,
+.console-content [class*="font-mono"] {
+  font-family: var(--mono) !important;
+  font-variant-numeric: tabular-nums !important;
+  letter-spacing: -0.01em;
+}
+
+.console-content .eyebrow {
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.09em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-3) !important;
+}
+
+.console-content .muted {
+  color: var(--ink-2) !important;
+}
+
+.console-content .dim {
+  color: var(--ink-3) !important;
+}
+
+/* ========================================================
+   CARDS & PANELS
+   ======================================================== */
+.console-content .panel,
+.console-content .bg-white {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r-lg) !important;
+  box-shadow: var(--shadow-1) !important;
+}
+
+/* Normalize overly rounded corners and large shadows */
+.console-content [class*="rounded-3xl"],
+.console-content [class*="rounded-2xl"],
+.console-content [class*="rounded-[2rem]"],
+.console-content [class*="rounded-[2.5rem]"] {
+  border-radius: var(--r-lg) !important;
+}
+
+.console-content [class*="shadow-xl"],
+.console-content [class*="shadow-2xl"],
+.console-content [class*="shadow-lg"] {
+  box-shadow: var(--shadow-1) !important;
+}
+
+/* Card Headers */
+.console-content .panel > header,
+.console-content .bg-white > div:first-child[class*="border-b"],
+.console-content [class*="border-b"][class*="bg-slate-50"] {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px !important;
+  border-bottom: 1px solid var(--line) !important;
+  background-color: var(--surface-2) !important;
+}
+
+.console-content .panel > header h3,
+.console-content .bg-white > div:first-child[class*="border-b"] h3 {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.005em !important;
+  color: var(--ink) !important;
+}
+
+/* ========================================================
+   KPI & STAT TILES
+   ======================================================== */
+.console-content .kpis {
+  display: grid;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-1);
+}
+
+.console-content .kpi {
+  padding: 14px 16px 15px;
+  border-left: 1px solid var(--line);
+  min-width: 0;
+}
+
+.console-content .kpi:first-child {
+  border-left: 0;
+}
+
+/* Stat numbers on dashboards */
+.console-content .text-2xl.font-bold,
+.console-content .text-3xl.font-bold {
+  font-family: var(--mono) !important;
+  font-size: 22px !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.02em !important;
+  font-variant-numeric: tabular-nums !important;
+  color: var(--ink) !important;
+  line-height: 1.15;
+}
+
+/* Stat tile label */
+.console-content .text-xs.font-semibold.uppercase,
+.console-content .text-\[10px\].font-black.uppercase {
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-3) !important;
+}
+
+/* Stat tile icon wrappers */
+.console-content .p-3.rounded-2xl {
+  border-radius: var(--r) !important;
+}
+
+/* ========================================================
+   TABLES
+   ======================================================== */
+.console-content .tablewrap {
+  overflow-x: auto;
+}
+
+.console-content table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.console-content table th {
+  text-align: left;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-3) !important;
+  padding: 10px 14px !important;
+  border-bottom: 1px solid var(--line) !important;
+  background-color: var(--surface-2) !important;
+  white-space: nowrap;
+}
+
+.console-content table td {
+  padding: 10px 14px !important;
+  border-bottom: 1px solid var(--line) !important;
+  vertical-align: middle !important;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.console-content table tbody tr {
+  transition: background-color 0.1s ease;
+}
+
+.console-content table tbody tr:hover,
+.console-content table tbody tr:hover td {
+  background-color: var(--surface-2) !important;
+}
+
+.console-content table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.console-content table td .sub {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 1px;
+}
+
+/* ========================================================
+   STATUS PILLS / BADGES
+   ======================================================== */
+.console-content .pill,
+.console-content span[class*="bg-emerald-100"],
+.console-content span[class*="bg-green-100"],
+.console-content span[class*="bg-amber-100"],
+.console-content span[class*="bg-yellow-100"],
+.console-content span[class*="bg-red-100"],
+.console-content span[class*="bg-blue-100"],
+.console-content span[class*="bg-indigo-100"],
+.console-content span[class*="bg-purple-100"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  padding: 2.5px 8px !important;
+  border-radius: 20px !important;
+  border: 1px solid transparent !important;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+  text-transform: none !important;
+  line-height: 1.4;
+}
+
+/* Approved / Good / Success */
+.console-content span[class*="bg-emerald-100"],
+.console-content span[class*="bg-green-100"],
+.console-content .pill.good {
+  color: var(--good) !important;
+  background-color: var(--good-bg) !important;
+  border-color: color-mix(in srgb, var(--good) 26%, transparent) !important;
+}
+
+/* Pending / Warn / Review */
+.console-content span[class*="bg-amber-100"],
+.console-content span[class*="bg-yellow-100"],
+.console-content .pill.warn {
+  color: var(--warn) !important;
+  background-color: var(--warn-bg) !important;
+  border-color: color-mix(in srgb, var(--warn) 30%, transparent) !important;
+}
+
+/* Rejected / Invalid / Crit */
+.console-content span[class*="bg-red-100"],
+.console-content .pill.crit {
+  color: var(--crit) !important;
+  background-color: var(--crit-bg) !important;
+  border-color: color-mix(in srgb, var(--crit) 28%, transparent) !important;
+}
+
+/* Info / General */
+.console-content span[class*="bg-blue-100"],
+.console-content span[class*="bg-indigo-100"],
+.console-content span[class*="bg-purple-100"],
+.console-content .pill.info {
+  color: var(--info) !important;
+  background-color: var(--info-bg) !important;
+  border-color: color-mix(in srgb, var(--info) 26%, transparent) !important;
+}
+
+/* Neutral pill */
+.console-content .pill.neut {
+  color: var(--ink-2);
+  background-color: var(--sunken);
+  border-color: var(--line);
+}
+
+/* Government ID Tag */
+.console-content [class*="bg-indigo-50"] {
+  background-color: var(--brand-soft) !important;
+  color: var(--primary-color, #2563eb) !important;
+  border: 1px solid color-mix(in srgb, var(--primary-color, #2563eb) 25%, transparent) !important;
+  border-radius: var(--r) !important;
+  padding: 3px 8px !important;
+}
+
+/* ========================================================
+   BUTTONS (Dynamic: Primary Color & Button Radius)
+   Strictly bound to system settings:
+   - Primary Color: var(--primary-color)
+   - Button Radius: var(--btn-radius)
+   ======================================================== */
+
+/* Global button radius enforcement for ALL buttons & button-like links in content area */
+.console-content button,
+.console-content .btn,
+.console-content a.btn,
+.console-content input[type="submit"],
+.console-content input[type="button"],
+.console-content input[type="reset"],
+.console-content a[class*="px-"][class*="py-"][class*="rounded"],
+.console-content button[class*="rounded"],
+.console-content a[class*="bg-primary"],
+.console-content button[class*="bg-primary"],
+.console-content a[class*="bg-emerald-500"],
+.console-content button[class*="bg-emerald-500"],
+.console-content a[class*="bg-emerald-600"],
+.console-content button[class*="bg-emerald-600"],
+.console-content a[class*="bg-indigo-600"],
+.console-content button[class*="bg-indigo-600"],
+.console-content a[class*="bg-blue-600"],
+.console-content button[class*="bg-blue-600"],
+.console-content a[class*="bg-slate-800"],
+.console-content button[class*="bg-slate-800"],
+.console-content a[class*="bg-slate-900"],
+.console-content button[class*="bg-slate-900"],
+.console-content a[class*="bg-white"][class*="border"],
+.console-content button[class*="bg-white"][class*="border"],
+.console-content a[class*="bg-slate-100"],
+.console-content button[class*="bg-slate-100"] {
+  border-radius: var(--btn-radius, var(--r)) !important;
+}
+
+/* Base button styling */
+.console-content .btn {
+  border: 1px solid var(--line-strong);
+  background-color: var(--surface);
+  border-radius: var(--btn-radius, var(--r)) !important;
+  padding: 7px 13px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  color: var(--ink-2);
+  transition: all 0.12s ease;
+}
+
+.console-content .btn:hover {
+  border-color: var(--ink-3);
+  color: var(--ink);
+}
+
+/* Primary Button - Dynamically bound to theme_primary_color & theme_button_radius */
+.console-content .btn.pri,
+.console-content a[class*="bg-primary"],
+.console-content button[class*="bg-primary"],
+.console-content a[class*="bg-blue-600"],
+.console-content button[class*="bg-blue-600"],
+.console-content a[class*="bg-indigo-600"],
+.console-content button[class*="bg-indigo-600"],
+.console-content a[class*="bg-emerald-500"],
+.console-content button[class*="bg-emerald-500"],
+.console-content a[class*="bg-emerald-600"],
+.console-content button[class*="bg-emerald-600"],
+.console-content button[type="submit"]:not([class*="bg-slate"]):not([class*="bg-red"]):not([class*="bg-gray"]):not([class*="bg-transparent"]) {
+  background-color: var(--primary-color, #2563eb) !important;
+  border: 1px solid var(--primary-color, #2563eb) !important;
+  color: #ffffff !important;
+  border-radius: var(--btn-radius, var(--r)) !important;
+  padding: 7px 14px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  box-shadow: var(--shadow-1) !important;
+  transition: background-color 0.12s ease, border-color 0.12s ease, filter 0.12s ease;
+}
+
+.console-content .btn.pri:hover,
+.console-content a[class*="bg-primary"]:hover,
+.console-content button[class*="bg-primary"]:hover,
+.console-content a[class*="bg-blue-600"]:hover,
+.console-content button[class*="bg-blue-600"]:hover,
+.console-content a[class*="bg-indigo-600"]:hover,
+.console-content button[class*="bg-indigo-600"]:hover,
+.console-content a[class*="bg-emerald-500"]:hover,
+.console-content button[class*="bg-emerald-500"]:hover,
+.console-content a[class*="bg-emerald-600"]:hover,
+.console-content button[class*="bg-emerald-600"]:hover,
+.console-content button[type="submit"]:not([class*="bg-slate"]):not([class*="bg-red"]):not([class*="bg-gray"]):not([class*="bg-transparent"]):hover {
+  background-color: color-mix(in srgb, var(--primary-color, #2563eb) 85%, black) !important;
+  border-color: color-mix(in srgb, var(--primary-color, #2563eb) 85%, black) !important;
+}
+
+/* Secondary / Outline Buttons */
+.console-content a[class*="bg-white"][class*="border"],
+.console-content button[class*="bg-white"][class*="border"],
+.console-content a[class*="bg-slate-100"],
+.console-content button[class*="bg-slate-100"],
+.console-content a[class*="bg-slate-50"][class*="border"],
+.console-content button[class*="bg-slate-50"][class*="border"] {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--line-strong) !important;
+  border-radius: var(--btn-radius, var(--r)) !important;
+  color: var(--ink-2) !important;
+  padding: 7px 13px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  box-shadow: none !important;
+}
+
+.console-content a[class*="bg-white"][class*="border"]:hover,
+.console-content button[class*="bg-white"][class*="border"]:hover,
+.console-content a[class*="bg-slate-100"]:hover,
+.console-content button[class*="bg-slate-100"]:hover,
+.console-content a[class*="bg-slate-50"][class*="border"]:hover,
+.console-content button[class*="bg-slate-50"][class*="border"]:hover {
+  border-color: var(--ink-3) !important;
+  color: var(--ink) !important;
+}
+
+/* Dark Action Buttons (e.g., Filter Apply, Test Email, Gateway Update) */
+.console-content button[class*="bg-slate-800"],
+.console-content button[class*="bg-slate-900"],
+.console-content a[class*="bg-slate-800"],
+.console-content a[class*="bg-slate-900"] {
+  border-radius: var(--btn-radius, var(--r)) !important;
+}
+
+/* Danger / Destructive Action Buttons (Retain red, enforce Theme Button Radius) */
+.console-content button[class*="bg-red"],
+.console-content a[class*="bg-red"] {
+  border-radius: var(--btn-radius, var(--r)) !important;
+}
+
+/* ========================================================
+   FORM CONTROLS & FILTERS
+   ======================================================== */
+.console-content input[type="text"],
+.console-content input[type="email"],
+.console-content input[type="password"],
+.console-content input[type="number"],
+.console-content input[type="date"],
+.console-content select,
+.console-content textarea {
+  background-color: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--btn-radius, var(--r)) !important;
+  color: var(--ink) !important;
+  font-size: 13px !important;
+  padding: 7px 11px !important;
+  box-shadow: inset 0 1px 1px rgba(17, 29, 22, 0.03) !important;
+  transition: border-color 0.12s, outline 0.12s;
+}
+  border: 1px solid var(--line) !important;
+  border-radius: var(--r) !important;
+  color: var(--ink) !important;
+  font-size: 13px !important;
+  padding: 7px 11px !important;
+  box-shadow: inset 0 1px 1px rgba(17, 29, 22, 0.03) !important;
+  transition: border-color 0.12s, outline 0.12s;
+}
+
+.console-content input:focus,
+.console-content select:focus,
+.console-content textarea:focus {
+  outline: 2px solid var(--primary-color, #2563eb) !important;
+  outline-offset: 1px !important;
+  border-color: var(--primary-color, #2563eb) !important;
+  box-shadow: none !important;
+}
+
+.console-content label {
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-3) !important;
+}
+
+/* Filter panel container */
+.console-content .filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--line);
+  background-color: var(--surface-2);
+}
+
+.console-content .chip {
+  border: 1px solid var(--line);
+  background-color: var(--surface);
+  border-radius: 20px;
+  padding: 3.5px 11px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--ink-2);
+}
+
+.console-content .chip.on {
+  background-color: var(--brand-soft);
+  border-color: color-mix(in srgb, var(--primary-color, #2563eb) 38%, transparent);
+  color: var(--primary-color, #2563eb);
+  font-weight: 600;
+}
+
+/* ========================================================
+   ALERT NOTIFICATIONS
+   ======================================================== */
+.console-content [class*="bg-emerald-50"],
+.console-content [class*="bg-green-50"] {
+  background-color: var(--good-bg) !important;
+  border: 1px solid color-mix(in srgb, var(--good) 30%, transparent) !important;
+  color: var(--good) !important;
+  border-radius: var(--r) !important;
+}
+
+.console-content [class*="bg-red-50"] {
+  background-color: var(--crit-bg) !important;
+  border: 1px solid color-mix(in srgb, var(--crit) 30%, transparent) !important;
+  color: var(--crit) !important;
+  border-radius: var(--r) !important;
+}
+
+.console-content [class*="bg-amber-50"],
+.console-content [class*="bg-yellow-50"] {
+  background-color: var(--warn-bg) !important;
+  border: 1px solid color-mix(in srgb, var(--warn) 30%, transparent) !important;
+  color: var(--warn) !important;
+  border-radius: var(--r) !important;
+}
+
+/* ========================================================
+   PAGINATION
+   ======================================================== */
+.console-content nav[role="navigation"] a,
+.console-content nav[role="navigation"] span {
+  border-radius: var(--btn-radius, var(--r)) !important;
+  font-size: 12px !important;
+}
+
+/* Footer border inside console-content */
+.console-content footer {
+  border-color: var(--line) !important;
+}
