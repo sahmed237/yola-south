@@ -16,14 +16,18 @@ class MonnifyGateway implements PaymentGatewayInterface
         $invoiceId = $invoice->id ?? $invoice['id'];
         $amount = (float) ($invoice->total_amount ?? $invoice->payment_amount ?? $invoice['total_amount'] ?? $invoice['payment_amount'] ?? 0);
         $contractCode = \App\Models\Setting::where('key', 'monnify_contract_code')->value('value') ?: config('services.monnify.contract_code');
-        $reference = $invoice->reference ?? $invoice['reference'] ?? ('INV-' . $invoiceId . '-' . time());
+        $baseRef = $invoice->reference ?? $invoice['reference'] ?? ('INV-' . $invoiceId);
+        $reference = $baseRef . '-' . time();
 
-        // Resolve customer name
+        // Resolve customer name and description
         $customerName = 'Taxpayer';
+        $paymentDescription = 'Unified Payment for Invoice #' . $invoiceId;
         if ($invoice instanceof \App\Models\Invoice) {
-            $establishment = $invoice->establishment;
-            if ($establishment) {
-                $customerName = $establishment->occupant->name ?? $establishment->name ?? 'Taxpayer';
+            if ($invoice->invoiceable instanceof \App\Models\ShopAllocation) {
+                $customerName = $invoice->invoiceable->applicant_name;
+                $paymentDescription = 'Shop Allocation #' . $invoice->invoiceable->application_no . ' Invoice';
+            } elseif ($invoice->establishment) {
+                $customerName = $invoice->establishment->occupant->name ?? $invoice->establishment->name ?? 'Taxpayer';
             }
         }
 
@@ -64,15 +68,27 @@ class MonnifyGateway implements PaymentGatewayInterface
             }
         }
 
+        // Resolve and sanitize customer email for Monnify requirement
+        $cleanEmail = trim($email ?: '');
+        if (empty($cleanEmail) || !filter_var($cleanEmail, FILTER_VALIDATE_EMAIL)) {
+            $candidateEmail = $invoice->email ?? null;
+            if (!empty($candidateEmail) && filter_var(trim($candidateEmail), FILTER_VALIDATE_EMAIL)) {
+                $cleanEmail = trim($candidateEmail);
+            } else {
+                $identifier = preg_replace('/[^a-zA-Z0-9]/', '', $phone ?: ($reference ?: ('inv' . $invoiceId)));
+                $cleanEmail = 'taxpayer.' . strtolower($identifier ?: rand(100000, 999999)) . '@yolasouth.lg.gov.ng';
+            }
+        }
+
         try {
             $api = MonnifyApi::getInstance();
             
             $payload = [
                 'amount' => $amount,
                 'customerName' => $customerName,
-                'customerEmail' => $email,
+                'customerEmail' => $cleanEmail,
                 'paymentReference' => $reference,
-                'paymentDescription' => 'Unified Payment for Invoice #' . $invoiceId,
+                'paymentDescription' => $paymentDescription,
                 'currencyCode' => 'NGN',
                 'contractCode' => $contractCode,
                 'redirectUrl' => $callbackUrl,

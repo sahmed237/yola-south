@@ -45,7 +45,14 @@ Route::prefix('shop-application')->name('public.shop-application.')->group(funct
     Route::post('/submit', [PublicShopApplicationController::class, 'submit'])->name('submit');
     Route::get('/track', [PublicShopApplicationController::class, 'track'])->name('track');
     Route::get('/track/{application_no}', [PublicShopApplicationController::class, 'trackStatus'])->name('track-status');
+    Route::get('/track/{application_no}/verify', [PublicShopApplicationController::class, 'showVerifyTracking'])->name('track-verify');
+    Route::post('/track/{application_no}/send-otp', [PublicShopApplicationController::class, 'sendTrackingOtp'])->name('track-send-otp');
+    Route::post('/track/{application_no}/verify-otp', [PublicShopApplicationController::class, 'verifyTrackingOtp'])->name('track-verify-otp');
+    Route::get('/update/{application_no}', [PublicShopApplicationController::class, 'edit'])->name('edit');
+    Route::post('/update/{application_no}', [PublicShopApplicationController::class, 'update'])->name('update');
     Route::get('/certificate/{application_no}', [PublicShopApplicationController::class, 'certificate'])->name('certificate');
+    Route::get('/checkout/{application_no}', [PublicShopApplicationController::class, 'checkout'])->name('checkout');
+    Route::get('/payment-callback/{application_no}', [PublicShopApplicationController::class, 'paymentCallback'])->name('payment-callback');
 });
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -151,8 +158,12 @@ Route::middleware(['auth', 'security_policy'])->prefix('admin')->group(function 
             Route::get('/{allocation}', [ShopAllocationController::class, 'show'])->name('show');
             Route::get('/{allocation}/card', [ShopAllocationController::class, 'card'])->name('card');
         });
-        Route::middleware('permission:review allocation')->group(function () {
+        Route::middleware('permission:review allocation|approve allocation|execute allocation')->group(function () {
             Route::post('/{allocation}/review', [ShopAllocationController::class, 'processReview'])->name('review');
+            Route::post('/{allocation}/request-update', [ShopAllocationController::class, 'requestUpdate'])->name('request-update');
+            Route::post('/{allocation}/revert', [ShopAllocationController::class, 'revert'])->name('revert');
+            Route::post('/{allocation}/reopen', [ShopAllocationController::class, 'reopen'])->name('reopen');
+            Route::post('/{allocation}/reject', [ShopAllocationController::class, 'reject'])->name('reject');
         });
         Route::middleware('permission:approve allocation')->group(function () {
             Route::post('/{allocation}/approve', [ShopAllocationController::class, 'processApproval'])->name('approve');
@@ -160,8 +171,9 @@ Route::middleware(['auth', 'security_policy'])->prefix('admin')->group(function 
         Route::middleware('permission:execute allocation')->group(function () {
             Route::post('/{allocation}/allocate', [ShopAllocationController::class, 'processAllocation'])->name('allocate');
             Route::post('/{allocation}/payment', [ShopAllocationController::class, 'processPayment'])->name('payment');
+            Route::post('/{allocation}/verify-payment', [ShopAllocationController::class, 'verifyPayment'])->name('verify-payment');
+            Route::post('/{allocation}/resend-payment-notice', [ShopAllocationController::class, 'resendPaymentNotice'])->name('resend-payment-notice');
             Route::post('/{allocation}/complete', [ShopAllocationController::class, 'processComplete'])->name('complete');
-            Route::post('/{allocation}/reject', [ShopAllocationController::class, 'reject'])->name('reject');
         });
     });
 

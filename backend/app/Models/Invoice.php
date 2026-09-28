@@ -11,6 +11,8 @@ class Invoice extends Model
 
     protected $fillable = [
         'establishment_id',
+        'invoiceable_type',
+        'invoiceable_id',
         'reference',
         'gateway',
         'email',
@@ -26,6 +28,11 @@ class Invoice extends Model
         'payment_fee' => 'float',
     ];
 
+    public function invoiceable()
+    {
+        return $this->morphTo();
+    }
+
     public function establishment()
     {
         return $this->belongsTo(Establishment::class);
@@ -34,6 +41,11 @@ class Invoice extends Model
     public function items()
     {
         return $this->hasMany(InvoiceItem::class);
+    }
+
+    public function genericItems()
+    {
+        return $this->hasMany(GenericInvoiceItem::class);
     }
 
     public function splits()

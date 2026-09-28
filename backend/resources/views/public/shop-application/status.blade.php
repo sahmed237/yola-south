@@ -40,6 +40,10 @@
                     <span class="px-4 py-1.5 bg-red-100 text-red-800 text-xs font-bold rounded-full inline-flex items-center gap-1.5">
                         <i data-lucide="x-circle" class="w-4 h-4"></i> Rejected
                     </span>
+                @elseif($allocation->status === 'action_required')
+                    <span class="px-4 py-1.5 bg-amber-100 text-amber-900 text-xs font-bold rounded-full inline-flex items-center gap-1.5 shadow-sm">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-700"></i> Action Required
+                    </span>
                 @else
                     <span class="px-4 py-1.5 bg-blue-100 text-blue-800 text-xs font-bold rounded-full inline-flex items-center gap-1.5">
                         <i data-lucide="clock" class="w-4 h-4"></i> Stage {{ $allocation->stage }} of 7 &mdash; {{ ucfirst($allocation->status) }}
@@ -84,7 +88,24 @@
         </div>
 
         <!-- Stage Message Banner -->
-        @if($allocation->stage === 7)
+        @if($allocation->status === 'action_required')
+        <div class="p-6 bg-amber-50 border border-amber-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 shadow-sm">
+            <div class="flex items-start gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-amber-200 text-amber-900 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-black text-amber-800 uppercase tracking-widest block mb-0.5">Applicant Action Required</span>
+                    <h3 class="text-sm font-bold text-amber-950">Updates Requested by Verification Officer</h3>
+                    <p class="text-xs text-amber-900 mt-1 leading-relaxed font-medium whitespace-pre-line">{{ $allocation->action_required_notes }}</p>
+                </div>
+            </div>
+            <a href="{{ route('public.shop-application.edit', $allocation->application_no) }}" class="primary-btn px-6 py-3 text-white font-bold text-xs uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                Update Application Now
+            </a>
+        </div>
+        @elseif($allocation->stage === 7)
         <div class="p-5 bg-emerald-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center flex-shrink-0">
@@ -100,15 +121,34 @@
                 View Official Card
             </a>
         </div>
-        @elseif($allocation->stage === 5 || $allocation->stage === 6)
+        @elseif($allocation->stage === 6 && $allocation->payment_status !== 'paid')
+        <div class="p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-6 shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-md">
+                    <i data-lucide="credit-card" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-emerald-950">Shop Unit Allocated &mdash; Invoice Ready for Settlement</h3>
+                    <p class="text-xs text-emerald-800 mt-0.5">Assigned Unit: <b class="font-mono">{{ $allocation->shop?->block_name }} &middot; Unit {{ $allocation->shop?->shop_number }} ({{ $allocation->shop?->shop_code }})</b></p>
+                    <div class="mt-2 text-xs font-semibold text-emerald-900">
+                        Total Amount Due: <span class="font-black text-emerald-700 font-mono text-sm">₦{{ number_format($allocation->rent_amount + $allocation->allocation_fee, 2) }}</span>
+                    </div>
+                </div>
+            </div>
+            <a href="{{ route('public.shop-application.checkout', $allocation->application_no) }}" class="primary-btn px-6 py-3 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+                Pay Online Now &rarr;
+            </a>
+        </div>
+        @elseif($allocation->stage === 5)
         <div class="p-5 bg-blue-50 border border-blue-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center flex-shrink-0">
-                    <i data-lucide="credit-card" class="w-5 h-5"></i>
+                    <i data-lucide="clock" class="w-5 h-5"></i>
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-blue-950">Shop Unit Allocated &mdash; Payment Pending</h3>
-                    <p class="text-xs text-blue-800">Your application has been approved and assigned unit <b class="font-mono">{{ $allocation->shop?->shop_code }}</b>. Please settle the initial invoice to receive your card.</p>
+                    <h3 class="text-sm font-bold text-blue-950">Application Approved &mdash; Unit Allocation in Progress</h3>
+                    <p class="text-xs text-blue-800">Your application has been approved by the Revenue Directorate. Council market officers are currently assigning your vacant shop unit.</p>
                 </div>
             </div>
         </div>

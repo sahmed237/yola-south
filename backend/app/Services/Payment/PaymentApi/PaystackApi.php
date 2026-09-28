@@ -25,12 +25,17 @@ class PaystackApi
         return self::$instance;
     }
 
+    private function httpClient()
+    {
+        $verify = !app()->isLocal() && !app()->runningUnitTests() && !empty(ini_get('curl.cainfo'));
+        return $verify ? Http::asJson() : Http::withoutVerifying()->asJson();
+    }
+
     public function post(string $endpoint, array $body = []): array
     {
-        $response = Http::withHeaders([
+        $response = $this->httpClient()->withHeaders([
             'Authorization' => 'Bearer ' . $this->secretKey,
             'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
         ])->post($this->baseUrl . '/' . ltrim($endpoint, '/'), $body);
 
         if (!$response->successful()) {
@@ -42,7 +47,7 @@ class PaystackApi
 
     public function get(string $endpoint, array $query = []): array
     {
-        $response = Http::withHeaders([
+        $response = $this->httpClient()->withHeaders([
             'Authorization' => 'Bearer ' . $this->secretKey,
             'Accept' => 'application/json',
         ])->get($this->baseUrl . '/' . ltrim($endpoint, '/'), $query);
@@ -56,10 +61,9 @@ class PaystackApi
 
     public function put(string $endpoint, array $body = []): array
     {
-        $response = Http::withHeaders([
+        $response = $this->httpClient()->withHeaders([
             'Authorization' => 'Bearer ' . $this->secretKey,
             'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
         ])->put($this->baseUrl . '/' . ltrim($endpoint, '/'), $body);
 
         if (!$response->successful()) {

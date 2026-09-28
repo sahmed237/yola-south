@@ -12,20 +12,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Montserrat:wght@300;400;600;700&family=Poppins:wght@300;400;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=Lato:wght@300;400;700&family=Nunito:wght@300;400;600;700&family=Raleway:wght@300;400;600;700&family=Ubuntu:wght@300;400;500;700&family=Quicksand:wght@300;400;600;700&family=Fira+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     <style>
+        [x-cloak] { display: none !important; }
         body { 
             font-family: '{{ $system_settings['theme_font_family'] ?? 'Outfit' }}', sans-serif; 
             background-color: #f8fafc;
         }
         :root {
             --primary-color: {{ $system_settings['theme_primary_color'] ?? '#58c6a5' }};
+            --btn-radius: {{ $system_settings['theme_button_radius'] ?? '0.75rem' }};
         }
         .primary-btn {
             background-color: var(--primary-color) !important;
-            box-shadow: 0 10px 15px -3px rgba(88, 198, 165, 0.2);
+            border-radius: var(--btn-radius, 0.75rem) !important;
+            box-shadow: 0 4px 14px -1px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease-in-out;
         }
-        .primary-btn:hover {
-            filter: brightness(0.95);
+        .primary-btn:hover:not(:disabled) {
+            filter: brightness(0.92);
+        }
+        .primary-btn:disabled, .primary-btn[disabled] {
+            opacity: 0.65;
+            cursor: not-allowed;
+            filter: grayscale(0.25);
         }
         .primary-text {
             color: var(--primary-color) !important;

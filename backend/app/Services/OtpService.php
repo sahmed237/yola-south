@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Models\Setting;
 use App\Models\ShopApplicationOtp;
+use App\Mail\ShopApplicationOtpMail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -10,6 +12,7 @@ class OtpService
 {
     /**
      * Generate and dispatch a 6-digit OTP to the given email
+     * Uses the database-configured SMTP settings from http://yls.local/admin/settings?group=email
      */
     public function generateAndSendOtp(string $email, string $purpose = 'Shop Allocation Application'): array
     {
@@ -27,12 +30,16 @@ class OtpService
             'expires_at' => $expiresAt,
         ]);
 
-        // Attempt sending email
+        // Dynamically apply database SMTP configuration
         try {
-            Mail::raw("Your Yola South Local Government verification code for {$purpose} is: {$otpCode}. It expires in 15 minutes. Do not share this code with anyone.", function ($message) use ($email, $purpose) {
-                $message->to($email)
-                    ->subject("YSLG-IMRS: Your Verification Code ({$purpose})");
-            });
+            Setting::configureMailer();
+        } catch (\Throwable $e) {
+            Log::warning("Could not apply dynamic mail settings: " . $e->getMessage());
+        }
+
+        // Attempt sending email with official Mailable & template
+        try {
+            Mail::to($email)->send(new ShopApplicationOtpMail($otpCode, $email, $purpose));
             $mailSent = true;
         } catch (\Throwable $e) {
             Log::warning("Failed to send OTP email to {$email}: " . $e->getMessage());
@@ -41,9 +48,8 @@ class OtpService
 
         return [
             'success' => true,
-            'message' => 'Verification code sent to your email.',
+            'message' => 'Verification code sent to your email address.',
             'expires_at' => $expiresAt->toIso8601String(),
-            'otp' => app()->environment(['local', 'testing', 'development']) ? $otpCode : null, // Dev helper
             'mail_sent' => $mailSent,
         ];
     }

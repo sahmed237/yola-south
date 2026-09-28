@@ -29,6 +29,12 @@ class MonnifyApi
         return self::$instance;
     }
 
+    private function httpClient()
+    {
+        $verify = !app()->isLocal() && !app()->runningUnitTests() && !empty(ini_get('curl.cainfo'));
+        return $verify ? Http::asJson() : Http::withoutVerifying()->asJson();
+    }
+
     private function login(): string
     {
         if ($this->token) {
@@ -39,9 +45,8 @@ class MonnifyApi
             throw new Exception('Monnify API Key or Secret Key is missing.');
         }
 
-        $response = Http::withHeaders([
+        $response = $this->httpClient()->withHeaders([
             'Authorization' => 'Basic ' . base64_encode($this->apiKey . ':' . $this->secretKey),
-            'Content-Type' => 'application/json',
         ])->post($this->baseUrl . '/api/v1/auth/login');
 
         if ($response->successful()) {
@@ -58,10 +63,9 @@ class MonnifyApi
     public function post(string $endpoint, array $body = []): array
     {
         $token = $this->login();
-        $response = Http::withHeaders([
+        $response = $this->httpClient()->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
         ])->post($this->baseUrl . '/' . ltrim($endpoint, '/'), $body);
 
         if (!$response->successful()) {
@@ -74,7 +78,7 @@ class MonnifyApi
     public function get(string $endpoint, array $query = []): array
     {
         $token = $this->login();
-        $response = Http::withHeaders([
+        $response = $this->httpClient()->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json',
         ])->get($this->baseUrl . '/' . ltrim($endpoint, '/'), $query);
@@ -111,7 +115,7 @@ class MonnifyApi
     public function delete(string $endpoint, array $query = []): array
     {
         $token = $this->login();
-        $response = Http::withHeaders([
+        $response = $this->httpClient()->withHeaders([
             'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json',
         ])->delete($this->baseUrl . '/' . ltrim($endpoint, '/'), $query);

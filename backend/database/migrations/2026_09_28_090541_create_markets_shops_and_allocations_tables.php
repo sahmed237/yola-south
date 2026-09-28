@@ -67,17 +67,7 @@ return new class extends Migration
             
             // 7-Stage Workflow
             $table->unsignedTinyInteger('stage')->default(1);
-            $table->enum('status', [
-                'pending',      // Stage 1
-                'review',       // Stage 2
-                'recommended',  // Stage 3
-                'approved',     // Stage 4
-                'allocated',    // Stage 5
-                'payment',      // Stage 6
-                'completed',    // Stage 7 (Card issued)
-                'rejected',
-                'cancelled'
-            ])->default('pending');
+            $table->string('status', 40)->default('pending');
 
             $table->decimal('rent_amount', 12, 2)->default(0.00);
             $table->decimal('allocation_fee', 12, 2)->default(5000.00);

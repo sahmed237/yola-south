@@ -101,11 +101,11 @@
                     <option value="">All Statuses</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
                     <option value="review" {{ request('status') === 'review' ? 'selected' : '' }}>Review</option>
+                    <option value="action_required" {{ request('status') === 'action_required' ? 'selected' : '' }}>Action Required</option>
                     <option value="approved" {{ request('status') === 'approved' ? 'selected' : '' }}>Approved</option>
                     <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed / Allocated</option>
                     <option value="rejected" {{ request('status') === 'rejected' ? 'selected' : '' }}>Rejected</option>
                 </select>
-
                 <select name="market_id" onchange="this.form.submit()" class="text-xs rounded-lg border-slate-200 py-1.5 focus:ring-emerald-500 focus:border-emerald-500">
                     <option value="">All Markets</option>
                     @foreach($markets as $m)
@@ -168,6 +168,8 @@
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">allocated</span>
                             @elseif($alloc->status === 'approved')
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">approved</span>
+                            @elseif($alloc->status === 'action_required')
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300">Action Required</span>
                             @elseif($alloc->status === 'review' || $alloc->stage === 2 || $alloc->stage === 3)
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">review</span>
                             @elseif($alloc->status === 'rejected')

@@ -15,7 +15,8 @@ class PaystackGateway implements PaymentGatewayInterface
     {
         $invoiceId = $invoice->id ?? $invoice['id'];
         $amount = (float) ($invoice->total_amount ?? $invoice->payment_amount ?? $invoice['total_amount'] ?? $invoice['payment_amount'] ?? 0);
-        $reference = $invoice->reference ?? $invoice['reference'] ?? ('INV-' . $invoiceId . '-' . time());
+        $baseRef = $invoice->reference ?? $invoice['reference'] ?? ('INV-' . $invoiceId);
+        $reference = $baseRef . '-' . time();
 
         $subaccounts = [];
         if ($invoice) {
@@ -30,12 +31,24 @@ class PaystackGateway implements PaymentGatewayInterface
             }
         }
 
+        // Resolve and sanitize email for Paystack requirement
+        $cleanEmail = trim($email ?: '');
+        if (empty($cleanEmail) || !filter_var($cleanEmail, FILTER_VALIDATE_EMAIL)) {
+            $candidateEmail = $invoice->email ?? null;
+            if (!empty($candidateEmail) && filter_var(trim($candidateEmail), FILTER_VALIDATE_EMAIL)) {
+                $cleanEmail = trim($candidateEmail);
+            } else {
+                $identifier = preg_replace('/[^a-zA-Z0-9]/', '', $phone ?: ($reference ?: ('inv' . $invoiceId)));
+                $cleanEmail = 'taxpayer.' . strtolower($identifier ?: rand(100000, 999999)) . '@yolasouth.lg.gov.ng';
+            }
+        }
+
         try {
             $api = PaystackApi::getInstance();
             
             $payload = [
                 'amount' => (int) round($amount * 100),
-                'email' => $email,
+                'email' => $cleanEmail,
                 'reference' => $reference,
                 'callback_url' => $callbackUrl,
                 'metadata' => [

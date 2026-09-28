@@ -12,6 +12,8 @@ class Payment extends Model
     protected $fillable = [
         'invoice_id',
         'establishment_id',
+        'payable_type',
+        'payable_id',
         'revenue_head_id',
         'amount',
         'status',
@@ -24,6 +26,11 @@ class Payment extends Model
     protected $casts = [
         'metadata' => 'array',
     ];
+
+    public function payable()
+    {
+        return $this->morphTo();
+    }
 
     public function invoice()
     {
