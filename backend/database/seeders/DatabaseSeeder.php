@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             EstablishmentSetupSeeder::class,
             FaqSeeder::class,
+            MarketAndShopSeeder::class,
         ]);
 
         $user = User::updateOrCreate(

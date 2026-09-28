@@ -112,6 +112,7 @@
             <div class="hidden lg:flex items-center gap-8">
                 <div class="flex items-center gap-6 text-xs font-bold uppercase tracking-widest text-slate-500">
                     <a href="{{ route('public.landing') }}" class="hover:text-slate-900 transition-colors {{ request()->routeIs('public.landing') ? 'primary-text border-b-2 border-primary-500 pb-1' : 'hover:border-b-2 hover:border-slate-300 pb-1' }}">Home</a>
+                    <a href="{{ route('public.shop-application.index') }}" class="hover:text-slate-900 transition-colors {{ request()->routeIs('public.shop-application.*') ? 'primary-text border-b-2 border-primary-500 pb-1' : 'hover:border-b-2 hover:border-slate-300 pb-1' }}">Shop Application</a>
                     <a href="{{ route('public.map') }}" class="hover:text-slate-900 transition-colors {{ request()->routeIs('public.map') ? 'primary-text border-b-2 border-primary-500 pb-1' : 'hover:border-b-2 hover:border-slate-300 pb-1' }}">Explore Map</a>
                     <a href="{{ route('public.how-to-pay') }}" class="hover:text-slate-900 transition-colors {{ request()->routeIs('public.how-to-pay') ? 'primary-text border-b-2 border-primary-500 pb-1' : 'hover:border-b-2 hover:border-slate-300 pb-1' }}">How to Pay</a>
                     <a href="{{ route('public.faq') }}" class="hover:text-slate-900 transition-colors {{ request()->routeIs('public.faq') ? 'primary-text border-b-2 border-primary-500 pb-1' : 'hover:border-b-2 hover:border-slate-300 pb-1' }}">FAQs</a>
@@ -144,6 +145,7 @@
             <div class="px-6 py-4 flex flex-col gap-4">
                 <div class="flex flex-col gap-3 text-xs font-bold uppercase tracking-widest text-slate-500">
                     <a href="{{ route('public.landing') }}" class="py-2 hover:text-slate-900 border-b border-slate-50 {{ request()->routeIs('public.landing') ? 'primary-text' : '' }}">Home</a>
+                    <a href="{{ route('public.shop-application.index') }}" class="py-2 hover:text-slate-900 border-b border-slate-50 {{ request()->routeIs('public.shop-application.*') ? 'primary-text' : '' }}">Shop Application</a>
                     <a href="{{ route('public.map') }}" class="py-2 hover:text-slate-900 border-b border-slate-50 {{ request()->routeIs('public.map') ? 'primary-text' : '' }}">Explore Map</a>
                     <a href="{{ route('public.how-to-pay') }}" class="py-2 hover:text-slate-900 border-b border-slate-50 {{ request()->routeIs('public.how-to-pay') ? 'primary-text' : '' }}">How to Pay</a>
                     <a href="{{ route('public.faq') }}" class="py-2 hover:text-slate-900 border-b border-slate-50 {{ request()->routeIs('public.faq') ? 'primary-text' : '' }}">FAQs</a>

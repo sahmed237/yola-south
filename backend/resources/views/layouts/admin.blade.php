@@ -143,10 +143,42 @@
                         <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 flex-shrink-0"></i>
                         <span class="truncate whitespace-nowrap">Dashboard</span>
                     </a>
+
+                    @canany(['view markets', 'view shops', 'view allocations'])
+                    <div class="pt-4 pb-2 text-xs font-semibold tracking-wider uppercase text-white/30">Commercial Registry</div>
+                    @can('view markets')
+                    <a href="{{ route('admin.markets.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.markets.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Markets & Shops">
+                        <i data-lucide="store" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Markets & Shops</span>
+                    </a>
+                    @endcan
+                    @can('view shops')
+                    <a href="{{ route('admin.shops.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.shops.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Shop Inventory">
+                        <i data-lucide="layout-grid" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <span class="truncate whitespace-nowrap">Shop Inventory</span>
+                    </a>
+                    @endcan
+                    @can('view allocations')
+                    @php
+                        $pendingAllocCount = \App\Models\ShopAllocation::whereIn('stage', [1, 2, 3])->count();
+                    @endphp
+                    <a href="{{ route('admin.allocations.index') }}" class="flex items-center justify-between px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.allocations.*') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Shop Allocations">
+                        <div class="flex items-center min-w-0">
+                            <i data-lucide="file-check" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                            <span class="truncate whitespace-nowrap">Shop Allocations</span>
+                        </div>
+                        @if($pendingAllocCount > 0)
+                        <span class="ml-2 px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-600 text-white flex-shrink-0">
+                            {{ $pendingAllocCount }}
+                        </span>
+                        @endif
+                    </a>
+                    @endcan
+                    @endcanany
                     
                     <div class="pt-4 pb-2 text-xs font-semibold tracking-wider uppercase text-white/30">Establishments</div>
                      <a href="{{ route('admin.establishments.index') }}" class="flex items-center px-4 py-3 text-sm font-medium transition-colors rounded-xl {{ request()->routeIs('admin.establishments.index') || request()->routeIs('admin.establishments.create') ? 'sidebar-active' : 'text-white/60 hover:bg-white/10 hover:text-white' }}" title="Establishments Management">
-                        <i data-lucide="store" class="w-5 h-5 mr-3 flex-shrink-0"></i>
+                        <i data-lucide="building" class="w-5 h-5 mr-3 flex-shrink-0"></i>
                         <span class="truncate whitespace-nowrap">All</span>
                     </a>
                     @can('view all establishment')

@@ -58,6 +58,23 @@ class RolesAndPermissionsSeeder extends Seeder
                 'users email',
                 'users unlock',
             ],
+            'Market & Shop Management' => [
+                'view markets',
+                'manage markets',
+                'create market',
+                'edit market',
+                'delete market',
+                'view shops',
+                'manage shops',
+                'create shop',
+                'edit shop',
+                'delete shop',
+                'view allocations',
+                'manage allocations',
+                'review allocation',
+                'approve allocation',
+                'execute allocation',
+            ],
             'System Configuration' => [
                 'manage faq',
             ],
@@ -85,6 +102,19 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage revenue heads',
             'view all invalid establishment',
             'view unpaid taxes',
+            'view markets',
+            'manage markets',
+            'create market',
+            'edit market',
+            'view shops',
+            'manage shops',
+            'create shop',
+            'edit shop',
+            'view allocations',
+            'manage allocations',
+            'review allocation',
+            'approve allocation',
+            'execute allocation',
         ]);
 
         $lgaCoordinator = Role::findOrCreate('lga-coordinator');
@@ -98,6 +128,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'view all invalid establishment',
             'request establishment update',
             'view unpaid taxes',
+            'view markets',
+            'view shops',
+            'view allocations',
+            'approve allocation',
         ]);
 
         $verificationOfficer = Role::findOrCreate('verification-officer');
@@ -107,6 +141,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'establishment approval',
             'edit establishment',
             'view all invalid establishment',
+            'view markets',
+            'view shops',
+            'view allocations',
+            'review allocation',
         ]);
 
         $fieldOfficer = Role::findOrCreate('field-officer');
@@ -119,6 +157,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'view payment',
             'view invoice',
             'view unpaid taxes',
+            'view markets',
+            'view shops',
+            'view allocations',
         ]);
 
         $agencyRep = Role::findOrCreate('agency-representative');

@@ -23,6 +23,11 @@ use App\Http\Controllers\Auth\SecurityEnforcementController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 
+use App\Http\Controllers\Admin\MarketController;
+use App\Http\Controllers\Admin\ShopController;
+use App\Http\Controllers\Admin\ShopAllocationController;
+use App\Http\Controllers\PublicShopApplicationController;
+
 Route::get('/', [PublicEstablishmentController::class, 'landing'])->name('public.landing');
 Route::get('/search', [PublicEstablishmentController::class, 'search'])->name('public.search');
 Route::get('/map', [PublicEstablishmentController::class, 'map'])->name('public.map');
@@ -31,6 +36,17 @@ Route::get('/faq', [PublicEstablishmentController::class, 'faq'])->name('public.
 Route::post('/public/pay', [PublicEstablishmentController::class, 'pay'])->name('public.pay');
 Route::get('/public/payment-success/{reference}', [PublicEstablishmentController::class, 'success'])->name('public.payment-success');
 Route::get('/public/payment-verify/{reference}', [PublicEstablishmentController::class, 'verifyReceipt'])->name('public.payment-verify');
+
+// Public Shop Allocation Application (Kanogis-inspired OTP & Tracking workflow)
+Route::prefix('shop-application')->name('public.shop-application.')->group(function () {
+    Route::get('/', [PublicShopApplicationController::class, 'index'])->name('index');
+    Route::post('/initiate-otp', [PublicShopApplicationController::class, 'initiateOtp'])->name('initiate-otp');
+    Route::post('/verify-otp', [PublicShopApplicationController::class, 'verifyOtp'])->name('verify-otp');
+    Route::post('/submit', [PublicShopApplicationController::class, 'submit'])->name('submit');
+    Route::get('/track', [PublicShopApplicationController::class, 'track'])->name('track');
+    Route::get('/track/{application_no}', [PublicShopApplicationController::class, 'trackStatus'])->name('track-status');
+    Route::get('/certificate/{application_no}', [PublicShopApplicationController::class, 'certificate'])->name('certificate');
+});
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
@@ -93,6 +109,61 @@ Route::middleware(['auth', 'security_policy'])->prefix('admin')->group(function 
 
     // Owner Lookup API (Internal)
     Route::get('/owners/search', [\App\Http\Controllers\Api\V1\OwnerLookupController::class, 'search'])->name('admin.owners.search');
+
+    // Markets Management (UI/index.html #markets)
+    Route::middleware('permission:view markets')->group(function () {
+        Route::get('/markets', [MarketController::class, 'index'])->name('admin.markets.index');
+        Route::get('/markets/{market}', [MarketController::class, 'show'])->name('admin.markets.show');
+    });
+    Route::middleware('permission:create market')->group(function () {
+        Route::get('/markets/create', [MarketController::class, 'create'])->name('admin.markets.create');
+        Route::post('/markets', [MarketController::class, 'store'])->name('admin.markets.store');
+    });
+    Route::middleware('permission:edit market')->group(function () {
+        Route::get('/markets/{market}/edit', [MarketController::class, 'edit'])->name('admin.markets.edit');
+        Route::put('/markets/{market}', [MarketController::class, 'update'])->name('admin.markets.update');
+    });
+    Route::middleware('permission:delete market')->group(function () {
+        Route::delete('/markets/{market}', [MarketController::class, 'destroy'])->name('admin.markets.destroy');
+    });
+
+    // Shop Inventory Management (UI/index.html #shops)
+    Route::middleware('permission:view shops')->group(function () {
+        Route::get('/shops', [ShopController::class, 'index'])->name('admin.shops.index');
+        Route::get('/shops/{shop}', [ShopController::class, 'show'])->name('admin.shops.show');
+    });
+    Route::middleware('permission:create shop')->group(function () {
+        Route::get('/shops/create', [ShopController::class, 'create'])->name('admin.shops.create');
+        Route::post('/shops', [ShopController::class, 'store'])->name('admin.shops.store');
+    });
+    Route::middleware('permission:edit shop')->group(function () {
+        Route::get('/shops/{shop}/edit', [ShopController::class, 'edit'])->name('admin.shops.edit');
+        Route::put('/shops/{shop}', [ShopController::class, 'update'])->name('admin.shops.update');
+    });
+    Route::middleware('permission:delete shop')->group(function () {
+        Route::delete('/shops/{shop}', [ShopController::class, 'destroy'])->name('admin.shops.destroy');
+    });
+
+    // Shop Allocations & 7-Stage Workflow (UI/index.html #allocations)
+    Route::prefix('allocations')->name('admin.allocations.')->group(function () {
+        Route::middleware('permission:view allocations')->group(function () {
+            Route::get('/', [ShopAllocationController::class, 'index'])->name('index');
+            Route::get('/{allocation}', [ShopAllocationController::class, 'show'])->name('show');
+            Route::get('/{allocation}/card', [ShopAllocationController::class, 'card'])->name('card');
+        });
+        Route::middleware('permission:review allocation')->group(function () {
+            Route::post('/{allocation}/review', [ShopAllocationController::class, 'processReview'])->name('review');
+        });
+        Route::middleware('permission:approve allocation')->group(function () {
+            Route::post('/{allocation}/approve', [ShopAllocationController::class, 'processApproval'])->name('approve');
+        });
+        Route::middleware('permission:execute allocation')->group(function () {
+            Route::post('/{allocation}/allocate', [ShopAllocationController::class, 'processAllocation'])->name('allocate');
+            Route::post('/{allocation}/payment', [ShopAllocationController::class, 'processPayment'])->name('payment');
+            Route::post('/{allocation}/complete', [ShopAllocationController::class, 'processComplete'])->name('complete');
+            Route::post('/{allocation}/reject', [ShopAllocationController::class, 'reject'])->name('reject');
+        });
+    });
 
     // System Setup
     Route::prefix('setup')->name('admin.setup.')->middleware('role:super-admin')->group(function () {
